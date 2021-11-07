@@ -2,7 +2,7 @@ package piece;
 
 public class Bishop extends Piece {
     public Bishop(boolean isWhite) {
-        super(3, isWhite);
+        super(PieceValue.BISHOP_VALUE, isWhite);
     }
 
     @Override

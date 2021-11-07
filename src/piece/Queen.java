@@ -2,7 +2,7 @@ package piece;
 
 public class Queen extends Piece {
     public Queen(boolean isWhite) {
-        super(9, isWhite);
+        super(PieceValue.QUEEN_VALUE, isWhite);
     }
 
     @Override

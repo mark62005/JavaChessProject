@@ -7,7 +7,7 @@ public class Pawn extends Piece {
     private Piece newPiece;
 
     public Pawn(boolean isWhite) {
-        super(1, isWhite);
+        super(PieceValue.PAWN_VALUE, isWhite);
     }
 
     public void promote(Piece newPiece) {

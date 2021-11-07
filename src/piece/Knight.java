@@ -2,7 +2,7 @@ package piece;
 
 public class Knight extends Piece {
     public Knight(boolean isWhite) {
-        super(2, isWhite);
+        super(PieceValue.KNIGHT_VALUE, isWhite);
     }
 
     @Override
