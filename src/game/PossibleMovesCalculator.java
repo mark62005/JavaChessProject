@@ -14,6 +14,7 @@ public class PossibleMovesCalculator {
 
         int row = piece.getPosition().getRow();
         int col = piece.getPosition().getCol();
+        // https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/Chess_oot45.svg/52px-Chess_oot45.svg.png
         Position[] possibleMoveCandidates = {
                 new Position(row + 2, col - 1),
                 new Position(row + 2, col + 1),
@@ -41,7 +42,7 @@ public class PossibleMovesCalculator {
         int currRow = piece.getPosition().getRow();
         int currCol = piece.getPosition().getCol();
         Set<Position> possibleMoves = new HashSet<>();
-
+        // https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/Chess_oot45.svg/52px-Chess_oot45.svg.png
         Position[] possibleMoveCandidates = {
                 new Position(currRow + 1, currCol - 1),
                 new Position(currRow + 1, currCol + 1),
@@ -49,36 +50,45 @@ public class PossibleMovesCalculator {
                 new Position(currRow - 1, currCol + 1),
         };
 
-        for (Position position : possibleMoveCandidates) {
-            while (position.isWithinBorder()) {
-                if (isNotAlly(board, position, piece.isWhite())) {
-                    possibleMoves.add(position);
-                    if (!isEnemy(board, position, piece.isWhite())) {
-                        // upper left
-                        if (position.getRow() > currRow && position.getCol() < currCol) {
-                            position.setRow(position.getRow() + 1);
-                            position.setCol(position.getCol() - 1);
-                            // upper right
-                        } else if (position.getRow() > currRow && position.getCol() > currCol) {
-                            position.setRow(position.getRow() + 1);
-                            position.setCol(position.getCol() + 1);
-                            // lower right
-                        } else if (position.getRow() < currRow && position.getCol() > currCol) {
-                            position.setRow(position.getRow() - 1);
-                            position.setCol(position.getCol() + 1);
-                            // lower left
-                        } else if (position.getRow() < currRow && position.getCol() < currCol) {
-                            position.setRow(position.getRow() - 1);
-                            position.setCol(position.getCol() - 1);
-                        }
-                    } else {
+        for (Position candidate : possibleMoveCandidates) {
+
+            // while the candidate to check is within board border
+            while (candidate.isWithinBorder()) {
+
+                // if that candidate is not an ally, add that candidate
+                if (isNotAlly(board, candidate, piece.isWhite())) {
+                    possibleMoves.add(candidate);
+                    // if that candidate is an enemy, move to next possibleMoveCandidate
+                    if (isEnemy(board, candidate, piece.isWhite())) {
                         break;
+                    } else {
+                        // if that candidate is not an enemy, search 1 further position with the same direction
+
+                        // upper left
+                        if (candidate.getRow() > currRow && candidate.getCol() < currCol) {
+                            candidate.setRow(candidate.getRow() + 1);
+                            candidate.setCol(candidate.getCol() - 1);
+                            // upper right
+                        } else if (candidate.getRow() > currRow && candidate.getCol() > currCol) {
+                            candidate.setRow(candidate.getRow() + 1);
+                            candidate.setCol(candidate.getCol() + 1);
+                            // lower right
+                        } else if (candidate.getRow() < currRow && candidate.getCol() > currCol) {
+                            candidate.setRow(candidate.getRow() - 1);
+                            candidate.setCol(candidate.getCol() + 1);
+                            // lower left
+                        } else if (candidate.getRow() < currRow && candidate.getCol() < currCol) {
+                            candidate.setRow(candidate.getRow() - 1);
+                            candidate.setCol(candidate.getCol() - 1);
+                        }
                     }
                 } else {
+                    // if that candidate is an ally, move to next possibleMoveCandidate
                     break;
                 }
 
             }
+
         }
 
         return possibleMoves;
@@ -90,6 +100,7 @@ public class PossibleMovesCalculator {
         int currCol = piece.getPosition().getCol();
         Set<Position> possibleMoves = new HashSet<>();
 
+        // https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Chessboard480.svg/416px-Chessboard480.svg.png
         Position[] possibleMoveCandidates = {
                 // up
                 new Position(currRow + 1, currCol),
@@ -103,10 +114,19 @@ public class PossibleMovesCalculator {
 
         // TODO: work on en passant
         for (Position position : possibleMoveCandidates) {
+
+            // while the candidate to check is within board border
             while (position.isWithinBorder()) {
+
+                // if that candidate is not an ally, add that candidate
                 if (isNotAlly(board, position, piece.isWhite())) {
                     possibleMoves.add(position);
-                    if (!isEnemy(board, position, piece.isWhite())) {
+                    // if that candidate is an enemy, move to next possibleMoveCandidate
+                    if (isEnemy(board, position, piece.isWhite())) {
+                        break;
+                    } else {
+                        // if that candidate is not an enemy, search 1 further position with the same direction
+
                         // up
                         if (position.getRow() > currRow && position.getCol() == currCol) {
                             position.setRow(position.getRow() + 1);
@@ -120,14 +140,14 @@ public class PossibleMovesCalculator {
                         } else if (position.getRow() == currRow && position.getCol() < currCol) {
                             position.setCol(position.getCol() - 1);
                         }
-                    } else {
-                        break;
                     }
                 } else {
+                    // if that candidate is an ally, move to next possibleMoveCandidate
                     break;
                 }
 
             }
+
         }
 
         return possibleMoves;
@@ -148,6 +168,7 @@ public class PossibleMovesCalculator {
             offset = -1;
         }
 
+        // https://en.wikipedia.org/wiki/Pawn_(chess)
         Position[] possibleMoveCandidates = {
                 // forward 1
                 new Position(currRow + offset, currCol),
@@ -184,9 +205,7 @@ public class PossibleMovesCalculator {
     }
 
     public static Set<Position> findQueenMoves(Piece[][] board, Piece piece) {
-
-        int currRow = piece.getPosition().getRow();
-        int currCol = piece.getPosition().getCol();
+        // https://en.wikipedia.org/wiki/Queen_(chess)
         Set<Position> possibleMoves = new HashSet<>();
 
         possibleMoves.addAll(findBishopMoves(board, piece));
@@ -200,7 +219,7 @@ public class PossibleMovesCalculator {
         int currRow = piece.getPosition().getRow();
         int currCol = piece.getPosition().getCol();
         Set<Position> possibleMoves = new HashSet<>();
-
+        // https://en.wikipedia.org/wiki/King_(chess)
         Position[] possibleMoveCandidates = {
                 // up
                 new Position(currRow + 1, currCol),
@@ -221,7 +240,6 @@ public class PossibleMovesCalculator {
         };
 
         // TODO: work on en passant
-
         for (Position position : possibleMoveCandidates) {
             if (position.isWithinBorder() && isNotAlly(board, position, piece.isWhite())) {
                 possibleMoves.add(position);
@@ -231,14 +249,16 @@ public class PossibleMovesCalculator {
         return possibleMoves;
     }
 
-    public static boolean isNotAlly (Piece[][] board, Position position, boolean isWhite) {
+    // check if that position is not an ally
+    public static boolean isNotAlly(Piece[][] board, Position position, boolean isWhite) {
         int row = position.getRow();
         int col = position.getCol();
 
         return board[row][col].isWhite() != isWhite;
     }
 
-    public static boolean isEnemy (Piece[][] board, Position position, boolean isWhite) {
+    // check if that position is an enemy
+    public static boolean isEnemy(Piece[][] board, Position position, boolean isWhite) {
         int row = position.getRow();
         int col = position.getCol();
 

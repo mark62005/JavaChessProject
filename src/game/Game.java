@@ -157,9 +157,7 @@ public class Game {
         pieceService.makeAMove(myPiece, newPos);
 
         // change the new position to be target piece
-        int newRow = currPos.getRow();
-        int newCol = currPos.getCol();
-        board[newRow][newCol] = myPiece;
+        setBoardAtPosition(myPiece, newPos);
 
         // if there's an enemy on the new position, capture it
         if (PossibleMovesCalculator.isEnemy(board, newPos, myPiece.isWhite())) {
@@ -167,9 +165,7 @@ public class Game {
         }
 
         // change the current position to be null
-        int row = currPos.getRow();
-        int col = currPos.getCol();
-        board[row][col] = null;
+        setBoardAtPosition(null, currPos);
     }
 
     // remove opponent's piece
