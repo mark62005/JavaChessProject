@@ -3,10 +3,7 @@ package game;
 import piece.*;
 import position.Position;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class Game {
 
@@ -175,6 +172,7 @@ public class Game {
         board[row][col] = null;
     }
 
+    // remove opponent's piece
     private void captureEnemy(Piece targetPiece, boolean isWhite) {
         List<Piece> pieces;
         if (isWhite) {
@@ -201,6 +199,67 @@ public class Game {
         } else {
             blackPlayer.setKingCaptured(true);
         }
+    }
+
+    // check if all of my possible moves contains opponent's King Position
+    public boolean isCheck(boolean isWhite) {
+        Player opponent;
+        if (isWhite) {
+            opponent = blackPlayer;
+        } else {
+            opponent = whitePlayer;
+        }
+
+        Map<Position, Set<Position>> myPossibleMoves = getAllPossibleMoves(isWhite);
+        for (Set<Position> positions : myPossibleMoves.values()) {
+            for (Position position : positions) {
+                if (position.equals(opponent.getKingPos())) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean isCheckmate(boolean isWhite) {
+
+        if (!isCheck(isWhite)) {
+            return false;
+        }
+
+        // find possible moves for opponent's King
+        Player opponent;
+        if (isWhite) {
+            opponent = blackPlayer;
+        } else {
+            opponent = whitePlayer;
+        }
+        Set<Position> opponentPossibleKingMoves = getPossibleMovesOfAPiece(opponent.getKingPos());
+
+        // find all my possible moves
+        Map<Position, Set<Position>> myPossibleMoves = getAllPossibleMoves(isWhite);
+        // flatten the "all my possible moves" map
+        Set<Position> flattenedMyPossibleMoves = new HashSet<>();
+        for (Set<Position> positions : myPossibleMoves.values()) {
+            flattenedMyPossibleMoves.addAll(positions);
+        }
+
+        // check if the flattened possible moves map contains
+        // all possible King moves of opponent
+        return flattenedMyPossibleMoves.containsAll(opponentPossibleKingMoves);
+    }
+
+    // if opponent's King is captured, return my side
+    // else, return null
+    public Side checkWin() {
+        if (whitePlayer.isKingCaptured()) {
+            return Side.BLACK;
+        }
+
+        if (blackPlayer.isKingCaptured()) {
+            return Side.WHITE;
+        }
+        return null;
     }
 
 }
