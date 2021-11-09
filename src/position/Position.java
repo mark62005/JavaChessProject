@@ -28,6 +28,10 @@ public class Position {
         this.col = col;
     }
 
+    public boolean isWithinBorder() {
+        return row < 8 && row >= 0 && col < 8 && col >= 0;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
