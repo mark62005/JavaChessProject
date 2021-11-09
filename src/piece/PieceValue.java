@@ -8,5 +8,14 @@ public class PieceValue {
     public static int ROOK_VALUE = 5;
     public static int QUEEN_VALUE = 9;
     public static int KING_VALUE = 1000;
+    public static String[] PIECES_WHITE = {
+        //   0     1      2     3      4      5
+           "♙", "♖", "♘", "♗", "♕", "♔"
+    };
+    public static String[] PIECES_BLACK = {
+        //   0     1      2     3      4      5
+           "♟", "♜", "♞", "♝", "♛", "♚"
+
+    };
 
 }
