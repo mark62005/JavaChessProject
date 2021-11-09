@@ -1,22 +1,21 @@
 package game;
 
 import piece.Piece;
+import piece.PieceValue;
+import position.Position;
 
 import java.util.*;
 
 public class Player {
 
-    private String name;
     private Side side;
     private List<Piece> pieces = new ArrayList<>();
+    private boolean isKingCaptured;
+    private Position kingPos;
 
-    public Player(String name, Side side) {
-        this.name = name;
+    public Player(Side side) {
         this.side = side;
-    }
-
-    public String getName() {
-        return name;
+        this.isKingCaptured = false;
     }
 
     public Side getSide() {
@@ -27,8 +26,36 @@ public class Player {
         return pieces;
     }
 
+    public boolean isKingCaptured() {
+        return isKingCaptured;
+    }
+
+    public void setKingCaptured(boolean kingCaptured) {
+        isKingCaptured = kingCaptured;
+    }
+
+    public Position getKingPos() {
+        return this.kingPos;
+    }
+
+    public void setKingPos(Position kingPos) {
+        if (this.kingPos == null) {
+            for (Piece piece : pieces) {
+                if (piece.getValue() == 1000) {
+                    this.kingPos = piece.getPosition();
+                }
+            }
+        } else {
+            this.kingPos = kingPos;
+        }
+    }
+
     public void addAPiece(Piece piece) {
         pieces.add(piece);
+
+        if (piece.getValue() == PieceValue.KING_VALUE) {
+            kingPos = piece.getPosition();
+        }
     }
 
 }

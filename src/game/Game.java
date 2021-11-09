@@ -4,21 +4,24 @@ import piece.*;
 import position.Position;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public class Game {
 
+    private PieceService pieceService;
     private Piece[][] board;
     private Player whitePlayer;
     private Player blackPlayer;
 
     public Game() {
-        this.whitePlayer = new Player("P1", Side.WHITE);
-        this.blackPlayer = new Player("P2", Side.BLACK);
+        this.whitePlayer = new Player(Side.WHITE);
+        this.blackPlayer = new Player(Side.BLACK);
         // initialize the board
         this.board = new Piece[8][8];
         initializeBoard();
+        this.pieceService = PieceService.getInstance();
     }
 
     public Piece[][] getBoard() {
@@ -130,6 +133,74 @@ public class Game {
         }
 
         return allPossibleMoves;
+    }
+
+    public void makeAMove(Position currPos, Position newPos) {
+        Piece myPiece = getPieceByPosition(currPos);
+        Piece targetPiece = getPieceByPosition(newPos);
+        Set<Position> possibleMoves = getPossibleMovesOfAPiece(currPos);
+
+        // throw an exception if there's no possible move for that position
+        if (possibleMoves == null) {
+            throw new IllegalArgumentException("Invalid Input. There's no possible move for this piece.");
+        }
+        // throw an exception if the new position is not a valid move of myPiece
+        if (!possibleMoves.contains(newPos)) {
+            throw new IllegalArgumentException("Invalid Input. This position is not a valid move.");
+        }
+
+        // if a player moves a King, change the King's Position of that player
+        if (myPiece.getValue() == 1000) {
+            if (myPiece.isWhite()) {
+                whitePlayer.setKingPos(newPos);
+            } else {
+                blackPlayer.setKingPos(newPos);
+            }
+        }
+        pieceService.makeAMove(myPiece, newPos);
+
+        // change the new position to be target piece
+        int newRow = currPos.getRow();
+        int newCol = currPos.getCol();
+        board[newRow][newCol] = myPiece;
+
+        // if there's an enemy on the new position, capture it
+        if (PossibleMovesCalculator.isEnemy(board, newPos, myPiece.isWhite())) {
+            captureEnemy(targetPiece, myPiece.isWhite());
+        }
+
+        // change the current position to be null
+        int row = currPos.getRow();
+        int col = currPos.getCol();
+        board[row][col] = null;
+    }
+
+    private void captureEnemy(Piece targetPiece, boolean isWhite) {
+        List<Piece> pieces;
+        if (isWhite) {
+            pieces = blackPlayer.getPieces();
+        } else {
+            pieces = whitePlayer.getPieces();
+        }
+
+        for (Piece piece : pieces) {
+            if (piece.equals(targetPiece)) {
+                // if that enemy is King
+                if (targetPiece.getClass().equals(King.class)) {
+                    captureKing(targetPiece.isWhite());
+                }
+                // remove that piece from the piece list
+                pieces.remove(piece);
+            }
+        }
+    }
+
+    private void captureKing(boolean isWhite) {
+        if (isWhite) {
+            whitePlayer.setKingCaptured(true);
+        } else {
+            blackPlayer.setKingCaptured(true);
+        }
     }
 
 }
