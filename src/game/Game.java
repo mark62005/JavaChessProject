@@ -3,6 +3,10 @@ package game;
 import piece.*;
 import position.Position;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 public class Game {
 
     private Piece[][] board;
@@ -70,6 +74,62 @@ public class Game {
             blackPlayer.addAPiece(piece);
         }
         setBoardAtPosition(piece, position);
+    }
+
+    private Piece getPieceByPosition(Position position) {
+        int row = position.getRow();
+        int col = position.getCol();
+
+        if (board[row][col] == null) {
+            throw new IllegalArgumentException("Invalid Input. This position is empty.");
+        }
+        return board[row][col];
+    }
+
+    public Set<Position> getPossibleMovesOfAPiece(Position position) {
+
+        Piece piece = getPieceByPosition(position);
+
+        switch (piece.getValue()) {
+            case PieceValue.PAWN_VALUE -> {
+                return PossibleMovesCalculator.findPawnMoves(board, piece);
+            }
+            case PieceValue.KNIGHT_VALUE -> {
+                return PossibleMovesCalculator.findKnightMoves(board, piece);
+            }
+            case PieceValue.BISHOP_VALUE -> {
+                return PossibleMovesCalculator.findBishopMoves(board, piece);
+            }
+            case PieceValue.ROOK_VALUE -> {
+                return PossibleMovesCalculator.findRookMoves(board, piece);
+            }
+            case PieceValue.QUEEN_VALUE -> {
+                return PossibleMovesCalculator.findQueenMoves(board, piece);
+            }
+            case PieceValue.KING_VALUE -> {
+                return PossibleMovesCalculator.findKingMoves(board, piece);
+            }
+            default -> throw new IllegalArgumentException("Invalid Input. This position is empty.");
+        }
+
+    }
+
+    public Map<Position, Set<Position>> getAllPossibleMoves(boolean isWhite) {
+        Map<Position, Set<Position>> allPossibleMoves = new HashMap<>();
+
+        if (isWhite) {
+            for (Piece piece : whitePlayer.getPieces()) {
+                Position position = piece.getPosition();
+                allPossibleMoves.put(position, getPossibleMovesOfAPiece(position));
+            }
+        } else {
+            for (Piece piece : blackPlayer.getPieces()) {
+                Position position = piece.getPosition();
+                allPossibleMoves.put(position, getPossibleMovesOfAPiece(position));
+            }
+        }
+
+        return allPossibleMoves;
     }
 
 }
