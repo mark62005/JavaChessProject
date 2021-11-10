@@ -37,17 +37,17 @@ public class Game {
     }
 
     private void initializePieces(Side side) {
-        int r1 = 7;
-        int r2 = 6;
+        int r1 = 0;
+        int r2 = 1;
         boolean isWhite = true;
 
         if (side.equals(Side.BLACK)) {
-            r1 = 0;
-            r2 = 1;
+            r1 = 7;
+            r2 = 6;
             isWhite = false;
         }
 
-        for (int i = 0; i < 8; i++) {
+        for (int i = 0; i < board.length; i++) {
             // 1st row
             Position row1 = new Position(r1, i);
             switch (i) {
@@ -62,7 +62,6 @@ public class Game {
             // 2nd row
             Position row2 = new Position(r2, i);
             initializeAPiece(new Pawn(isWhite), row2);
-
         }
     }
 
