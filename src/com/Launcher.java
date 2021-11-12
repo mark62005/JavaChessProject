@@ -133,12 +133,11 @@ public class Launcher {
     }
 
     public static void printQuestion(Game game) {
-        System.out.printf("""
-                
-                %s to move
-                Enter UCI (type 'help' for help):\040""",
+        System.out.printf(
+                "\n%s to move",
                 capitalize(game.getColorToMove().toString())
         );
+        System.out.println("Enter UCI (type 'help' for help): ");
     }
 
     // capitalize a string
@@ -150,14 +149,13 @@ public class Launcher {
     }
 
     public static void printHelp() {
-        System.out.println("""
-                * type 'help' for help
-                * type 'board' to see the board again
-                * type 'resign' to resign
-                * type 'moves' to lists all possible moves
-                * type a square (e.g. b1, e2) to list possible moves for that square
-                * type UCI (e.g. b13, e7e8q) to make a move
-                """);
+        System.out.println("* type 'help' for help");
+        System.out.println("* type 'board' to see the board again");
+        System.out.println("* type 'resign' to resign");
+        System.out.println("* type 'moves' to lists all possible moves");
+        System.out.println("* type a square (e.g. b1, e2) to list possible moves for that square");
+        System.out.println("* type UCI (e.g. b13, e7e8q) to make a move");
+        System.out.println();
     }
 
     // TODO: think about more errors
