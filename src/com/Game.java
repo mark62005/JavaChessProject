@@ -22,7 +22,7 @@ public class Game {
         this.board = new Piece[8][8];
         initializeBoard();
 
-        this.colorToMove = Color.BLACK;
+        this.colorToMove = Color.WHITE;
     }
 
     public static Game getInstance() {
@@ -88,12 +88,23 @@ public class Game {
             // 1st rank
             Square squareAtR1 = new Square(r1, i);
             switch (i) {
-                case 0, 7 -> initializeAPiece(new Rook(isWhite), squareAtR1);
-                case 1, 6 -> initializeAPiece(new Knight(isWhite), squareAtR1);
-                case 2, 5 -> initializeAPiece(new Bishop(isWhite), squareAtR1);
-                case 3 -> initializeAPiece(new Queen(isWhite), squareAtR1);
-                case 4 -> initializeAPiece(new King(isWhite), squareAtR1);
-                default -> {}
+                case 0, 7:
+                    initializeAPiece(new Rook(isWhite), squareAtR1);
+                    break;
+                case 1, 6:
+                    initializeAPiece(new Knight(isWhite), squareAtR1);
+                    break;
+                case 2, 5:
+                    initializeAPiece(new Bishop(isWhite), squareAtR1);
+                    break;
+                case 3:
+                    initializeAPiece(new Queen(isWhite), squareAtR1);
+                    break;
+                case 4:
+                    initializeAPiece(new King(isWhite), squareAtR1);
+                    break;
+                default:
+                    break;
             }
             // 2nd rank
             Square SquareAtR2 = new Square(r2, i);
@@ -170,6 +181,8 @@ public class Game {
         if (possibleMoves.stream().noneMatch(m -> m.getTo().equals(to))) {
             throw new IllegalArgumentException("Invalid Input. This square is not a valid move.");
         }
+
+        // TODO: work on conditions
 
         // perform a move
         move.makeAMove(this, myPiece);

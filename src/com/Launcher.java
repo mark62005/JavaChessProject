@@ -72,15 +72,23 @@ public class Launcher {
         String userInput = getUserInput(scanner, game);
         switch (userInput) {
             // * type 'help' for help
-            case "help" -> printHelp();
+            case "help":
+                printHelp();
+                break;
             // * type 'board' to see the board again
-            case "board" -> printBoard(game);
+            case "board":
+                printBoard(game);
+                break;
             // * type 'resign' to resign
-            case "resign" -> resign();
+            case "resign":
+                resign();
+                break;
             // * type 'moves' to lists all possible moves
-            case "moves" -> printAllPossibleMoves(game);
+            case "moves":
+                printAllPossibleMoves(game);
+                break;
             // else
-            default -> {
+            default:
                 // * type a square (e.g. b1, e2) to list possible moves for that square
                 if (isSquarePattern(userInput)) {
                     printMovesForSquare(scanner, game, userInput);
@@ -94,7 +102,7 @@ public class Launcher {
                     // start the function again
                     readMove(scanner, game);
                 }
-            }
+                break;
         }
     }
 
