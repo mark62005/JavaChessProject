@@ -58,6 +58,7 @@ public class Move {
         } else if (value == PAWN_VALUE) {
             Pawn pawn = (Pawn) piece;
             // TODO: work on promotion condition
+            pawn.setFirstMove(false);
             if (canEnPassant(pawn)) {
                 pawn.setCanEnPassant(true);
             }
