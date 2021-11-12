@@ -22,7 +22,7 @@ public class Game {
         this.board = new Piece[8][8];
         initializeBoard();
 
-        this.colorToMove = Color.BLACK;
+        this.colorToMove = Color.WHITE;
     }
 
     public static Game getInstance() {

@@ -137,7 +137,7 @@ public class Launcher {
                 "\n%s to move",
                 capitalize(game.getColorToMove().toString())
         );
-        System.out.println("Enter UCI (type 'help' for help): ");
+        System.out.print("\nEnter UCI (type 'help' for help): ");
     }
 
     // capitalize a string
@@ -154,8 +154,7 @@ public class Launcher {
         System.out.println("* type 'resign' to resign");
         System.out.println("* type 'moves' to lists all possible moves");
         System.out.println("* type a square (e.g. b1, e2) to list possible moves for that square");
-        System.out.println("* type UCI (e.g. b13, e7e8q) to make a move");
-        System.out.println();
+        System.out.println("* type UCI (e.g. b1c3, e7e8q) to make a move");
     }
 
     // TODO: think about more errors
