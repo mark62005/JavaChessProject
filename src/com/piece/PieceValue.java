@@ -1,4 +1,4 @@
-package piece;
+package com.piece;
 
 public class PieceValue {
 
