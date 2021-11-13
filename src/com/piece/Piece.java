@@ -4,6 +4,7 @@ import com.Game;
 import com.move.AttackMove;
 import com.move.Move;
 import com.Square;
+import com.move.PawnPromotion;
 
 import java.util.Objects;
 import java.util.Set;
@@ -38,7 +39,7 @@ public abstract class Piece {
         return symbol;
     }
 
-    public abstract void setSymbol(boolean isWhite);
+    protected abstract void setSymbol(boolean isWhite);
 
     public Square getSquare() {
         return square;
@@ -69,6 +70,30 @@ public abstract class Piece {
         Piece enemy = game.getPieceAt(to);
         Square newTo = new Square(to);
         moves.add(new AttackMove(from, newTo, enemy));
+    }
+
+    protected void addPromotionMove(Set<Move> moves, Square from, Square to, char promoteTo) {
+        Piece newPiece;
+        switch (promoteTo) {
+            case 'k':
+                newPiece = new Knight(this.isWhite);
+                break;
+            case 'b':
+                newPiece = new Bishop(this.isWhite);
+                break;
+            case 'r':
+                newPiece = new Rook(this.isWhite);
+                break;
+            case 'q':
+                newPiece = new Queen(this.isWhite);
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid input. A pawn cannot be promoted to a King or a Pawn.");
+        }
+
+        newPiece.setSquare(this.square);
+        newPiece.setPrevMove(this.prevMove);
+        moves.add(new PawnPromotion(from, to, newPiece));
     }
 
     protected final boolean isNotAlly (Game game, Square to) {

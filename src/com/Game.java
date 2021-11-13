@@ -1,6 +1,7 @@
 package com;
 
 import com.move.Move;
+import com.move.PawnPromotion;
 import com.piece.*;
 
 import java.util.*;
@@ -174,7 +175,7 @@ public class Game {
         return allPossibleMoves;
     }
 
-    public void makeAMove(Move move) {
+    public void makeAMove(String condition, Move move) {
         Square from = move.getFrom();
         Square to = move.getTo();
         Piece myPiece = getPieceAt(from);
@@ -189,13 +190,19 @@ public class Game {
             throw new IllegalArgumentException("Invalid Input. This square is not a valid move.");
         }
 
-        // TODO: work on conditions
-        // check if it is a non-normal move,
-        // if true, set "move" to be that non-normal move
-        for (Move m : possibleMoves) {
-            if (m.getTo().equals(move.getTo())) {
-                System.out.println(m);
-                move = m;
+        if (!condition.equals("promotion")) {
+            // check if it is a non-normal move,
+            // if true, set "move" to be that non-normal move
+            for (Move m : possibleMoves) {
+                if (m.getTo().equals(move.getTo())) {
+                    System.out.println(m);
+                    move = m;
+                }
+            }
+        } else {
+            // check if that piece is a pawn
+            if (myPiece.getValue() != PieceValue.PAWN_VALUE) {
+                throw new IllegalArgumentException("Invalid input. Only a pawn can be promoted.");
             }
         }
         // perform a move
@@ -207,20 +214,33 @@ public class Game {
         switchPlayer();
     }
 
-    private boolean isValidMove(Set<Move> possibleMoves, Square to) {
+    public void makeAPromotionMove(PawnPromotion promotion) {
+        Square from = promotion.getFrom();
+        Square to = promotion.getTo();
+        Piece myPiece = getPieceAt(from);
 
+        Set<Move> possibleMoves = myPiece.findPossibleMoves(this);
+        if (isValidMove(possibleMoves, to)) {
+            // perform a promotion move
+            promotion.makeAMove(this, myPiece);
 
-        return true;
+            // check if anyone wins after each move
+            checkWin();
+            // switch the player after each move
+            switchPlayer();
+        }
     }
 
-    private boolean canPromote(Piece pawn, int rank) {
-        // if it is a white piece
-        if (pawn.isWhite()) {
-            return rank == 7;
-        } else {
-            // if it is a black piece
-            return rank == 0;
+    private boolean isValidMove(Set<Move> possibleMoves, Square to) {
+        // throw an exception if there's no possible move for that square
+        if (possibleMoves.isEmpty()) {
+            throw new IllegalArgumentException("Invalid Input. There's no possible move for this piece.");
         }
+        // throw an exception if the new square is not a valid move of myPiece
+        if (possibleMoves.stream().noneMatch(m -> m.getTo().equals(to))) {
+            throw new IllegalArgumentException("Invalid Input. This square is not a valid move.");
+        }
+        return true;
     }
 
     private void switchPlayer() {
