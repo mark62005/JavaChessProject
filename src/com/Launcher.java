@@ -1,6 +1,8 @@
 package com;
 
 import com.move.Move;
+import com.move.PawnPromotion;
+import com.piece.Pawn;
 import com.piece.Piece;
 
 import java.util.*;
@@ -14,8 +16,13 @@ public class Launcher {
         Scanner scanner = new Scanner(System.in);
         Game game = Game.getInstance();
 
-        game.setPieceAt(new Square(1, 3), null);
+//        // test
+        game.setPieceAt(new Square(7, 3), null);
         game.setPieceAt(new Square(6, 3), null);
+        Pawn pawn = new Pawn(true);
+        pawn.setSquare(new Square(6,3));
+        game.getWhitePlayer().getPieces().add(pawn);
+        game.setPieceAt(new Square(6, 3), pawn);
 
         // start the game
         printStartMessage();
@@ -60,7 +67,6 @@ public class Launcher {
             System.out.print(" " + i);
             System.out.println();
         }
-
         System.out.println();
     }
 
@@ -97,7 +103,7 @@ public class Launcher {
                     printMovesForSquare(scanner, game, userInput);
                     readMove(scanner, game);
                     // * type UCI (e.g. b13, e7e8q) to make a move
-                } else if (isUciPattern(userInput)) {
+                } else if (isUciPattern(userInput) || isPromotionPattern(userInput)) {
                     performMove(scanner, game, userInput);
                 } else {
                     // TODO: write invalid input message
@@ -109,17 +115,55 @@ public class Launcher {
         }
     }
 
-    // TODO: think about more errors
+    // TODO: make sure a pawn is being promoted if it's moving from the 2nd last Rank to last Rank
     public static void performMove(Scanner scanner, Game game, String userInput) {
         try {
-            Move move = Move.parseUCI(userInput);
-            System.out.println("ok");
-            game.makeAMove(move);
+            // make a move other than promotion
+            if (!isPromotionPattern(userInput)) {
+                Move move = Move.parseUCI(userInput);
+
+                if (!isMyPiece(game, move)) {
+                    System.out.println(
+                            "Invalid input, please choose a " +
+                                    game.getColorToMove().toString() + " piece."
+                    );
+                    readMove(scanner, game);
+                } else {
+                    System.out.println("ok");
+                    game.makeAMove("move", move);
+                }
+            } else {
+                // make a promotion move
+                Move move = PawnPromotion.parsePromotionUCI(game, userInput);
+
+                if (!isMyPiece(game, move)) {
+                    System.out.println(
+                            "Invalid input, please choose a " +
+                                    game.getColorToMove().toString() + " piece."
+                    );
+                    readMove(scanner, game);
+                } else {
+                    System.out.println("ok");
+                    game.makeAMove("promotion", move);
+                }
+            }
+
             printBoard(game);
         } catch (IllegalArgumentException e) {
             System.out.println(e.getLocalizedMessage());
             readMove(scanner, game);
         }
+    }
+
+    public static boolean isMyPiece(Game game, Move move) {
+        List<Piece> myPieces = game.getWhitePlayer().getPieces();
+
+        if (game.getColorToMove().equals(Color.BLACK)) {
+            myPieces = game.getBlackPlayer().getPieces();
+        }
+
+        Piece piece = game.getPieceAt(move.getFrom());
+        return myPieces.contains(piece);
     }
 
     public static String getUserInput(Scanner scanner, Game game) {

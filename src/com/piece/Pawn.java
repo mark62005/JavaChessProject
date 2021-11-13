@@ -24,7 +24,7 @@ public class Pawn extends Piece {
     }
 
     @Override
-    public void setSymbol(boolean isWhite) {
+    protected void setSymbol(boolean isWhite) {
         if (isWhite) {
             this.symbol = PieceSymbol.WHITE_PAWN_SYMBOL;
         } else {
@@ -98,10 +98,23 @@ public class Pawn extends Piece {
             Square candidate = possibleMoveCandidates[i];
             if (candidate.isWithinBorder() && isNotAlly(game, candidate)) {
                     if (i == 0) {
-                        if (!isEnemy(game, candidate)) {
-                            // normal move
-                            addNormalMove(possibleMoves, this.square, candidate);
+                        if (
+                                this.isWhite && candidate.getRank() == 7 ||
+                                !this.isWhite && candidate.getRank() == 0
+                        ) {
+                            if (!isEnemy(game, candidate)) {
+                                // Promotion
+                                addNormalMove(possibleMoves, this.square, candidate);
+                            } else {
+
+                            }
+                        } else {
+                            if (!isEnemy(game, candidate)) {
+                                // normal move
+                                addNormalMove(possibleMoves, this.square, candidate);
+                            }
                         }
+
                     } else if (i == 1) {
                         // pawn jump
                         if (isFirstMove &&

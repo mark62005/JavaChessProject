@@ -7,7 +7,7 @@ import com.Square;
 import com.piece.Piece;
 import com.piece.PieceValue;
 
-public class AttackMove extends Move {
+public class AttackMove extends Move implements Attack {
 
     protected Piece enemy;
 
@@ -24,30 +24,29 @@ public class AttackMove extends Move {
     @Override
     public void makeAMove(Game game, Piece myPiece) {
         super.makeAMove(game, myPiece);
-
-        captureEnemy(game);
+        captureEnemy(game, to);
     }
 
-    protected Player getOpponent(Game game) {
-        if (game.getColorToMove().equals(Color.WHITE)) {
-            return game.getBlackPlayer();
-        }
-        return game.getWhitePlayer();
-    }
-
-    protected void captureEnemy(Game game) {
-        Player opponent = getOpponent(game);
-        for (Piece piece : opponent.getPieces()) {
-            if (enemy.equals(piece)) {
-                opponent.getPieces().remove(enemy);
-                break;
-            }
-        }
-
-        if (enemy.getValue() == PieceValue.KING_VALUE) {
-            opponent.setKingCaptured(true);
-        }
-    }
+//    protected Player getOpponent(Game game) {
+//        if (game.getColorToMove().equals(Color.WHITE)) {
+//            return game.getBlackPlayer();
+//        }
+//        return game.getWhitePlayer();
+//    }
+//
+//    protected void captureEnemy(Game game) {
+//        Player opponent = getOpponent(game);
+//        for (Piece piece : opponent.getPieces()) {
+//            if (enemy.equals(piece)) {
+//                opponent.getPieces().remove(enemy);
+//                break;
+//            }
+//        }
+//        // capture King
+//        if (enemy.getValue() == PieceValue.KING_VALUE) {
+//            opponent.setKingCaptured(true);
+//        }
+//    }
 
     @Override
     public String toString() {
