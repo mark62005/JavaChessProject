@@ -9,8 +9,9 @@ import com.piece.*;
 import java.util.List;
 
 // TODO
-public class PawnPromotion extends Move {
+public class PawnPromotion extends Move implements Attack {
     private Piece promoteTo;
+    private Piece enemy;
 
     public PawnPromotion(Square from, Square to, Piece promoteTo) {
         super(from, to);
@@ -34,6 +35,10 @@ public class PawnPromotion extends Move {
     public void makeAMove(Game game, Piece myPiece) {
         if (isValidPromotion(myPiece)) {
             promote(game, myPiece);
+            // if the move destination is an enemy, capture it
+            if (myPiece.isEnemy(game, to)) {
+                captureEnemy(game, to);
+            }
             updateBoard(game, promoteTo);
             System.out.println("The pawn has been promoted successfully.");
         }
@@ -57,7 +62,7 @@ public class PawnPromotion extends Move {
     }
 
     private void promote(Game game, Piece currPiece) {
-        promoteTo.setSquare(currPiece.getSquare());
+        promoteTo.setSquare(to);
         updatePieces(game, currPiece);
     }
 
@@ -111,4 +116,12 @@ public class PawnPromotion extends Move {
         return new PawnPromotion(move, newPiece);
     }
 
+    @Override
+    public String toString() {
+        return "PawnPromotion{" +
+                "from=" + from +
+                ", to=" + to +
+                ", promoteTo=" + promoteTo +
+                '}';
+    }
 }
