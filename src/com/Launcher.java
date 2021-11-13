@@ -14,6 +14,9 @@ public class Launcher {
         Scanner scanner = new Scanner(System.in);
         Game game = Game.getInstance();
 
+        game.setPieceAt(new Square(1, 3), null);
+        game.setPieceAt(new Square(6, 3), null);
+
         // start the game
         printStartMessage();
         printBoard(game);
@@ -133,12 +136,11 @@ public class Launcher {
     }
 
     public static void printQuestion(Game game) {
-        System.out.printf("""
-                
-                %s to move
-                Enter UCI (type 'help' for help):\040""",
+        System.out.printf(
+                "\n%s to move",
                 capitalize(game.getColorToMove().toString())
         );
+        System.out.print("\nEnter UCI (type 'help' for help): ");
     }
 
     // capitalize a string
@@ -150,14 +152,12 @@ public class Launcher {
     }
 
     public static void printHelp() {
-        System.out.println("""
-                * type 'help' for help
-                * type 'board' to see the board again
-                * type 'resign' to resign
-                * type 'moves' to lists all possible moves
-                * type a square (e.g. b1, e2) to list possible moves for that square
-                * type UCI (e.g. b13, e7e8q) to make a move
-                """);
+        System.out.println("* type 'help' for help");
+        System.out.println("* type 'board' to see the board again");
+        System.out.println("* type 'resign' to resign");
+        System.out.println("* type 'moves' to lists all possible moves");
+        System.out.println("* type a square (e.g. b1, e2) to list possible moves for that square");
+        System.out.println("* type UCI (e.g. b1c3, e7e8q) to make a move");
     }
 
     // TODO: think about more errors
@@ -169,7 +169,7 @@ public class Launcher {
             if (possibleMoveDestinations.isEmpty()) {
                 System.out.printf("No possible move for %s.\n", userInput);
             } else {
-                System.out.printf("Possible moves for %s\n", userInput);
+                System.out.printf("Possible moves for %s:\n", userInput);
                 System.out.println(possibleMoveDestinations);
             }
         } catch (IllegalArgumentException e) {
@@ -180,9 +180,19 @@ public class Launcher {
 
     public static Set<Square> getPossibleMoveDestinations(Game game, Square square) {
         Set<Move> possibleMoves = game.getPossibleMovesForPieceAt(square);
+
+        if (game.getColorToMove().equals(Color.WHITE)) {
+            return possibleMoves.stream()
+                    .map(Move::getTo)
+                    // sort the moves by the rank of the destination square
+                    .sorted(Comparator.comparingInt(Square::getRank))
+                    .collect(Collectors.toCollection(LinkedHashSet::new));
+        }
         return possibleMoves.stream()
                 .map(Move::getTo)
-                .collect(Collectors.toSet());
+                // sort the moves by the rank of the destination square
+                .sorted(Comparator.comparingInt(Square::getRank).reversed())
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     public static void printAllPossibleMoves(Game game) {

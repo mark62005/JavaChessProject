@@ -64,7 +64,7 @@ public class Pawn extends Piece {
 
     @Override
     public void move() {
-        System.out.println("One square");
+        System.out.println("Forward 1");
     }
 
     @Override
@@ -97,22 +97,25 @@ public class Pawn extends Piece {
 
             Square candidate = possibleMoveCandidates[i];
             if (candidate.isWithinBorder() && isNotAlly(game, candidate)) {
-                if (!isEnemy(game, candidate)) {
-                    // normal move
                     if (i == 0) {
-                        addNormalMove(possibleMoves, this.square, candidate);
+                        if (!isEnemy(game, candidate)) {
+                            // normal move
+                            addNormalMove(possibleMoves, this.square, candidate);
+                        }
+                    } else if (i == 1) {
                         // pawn jump
-                    } else if (
-                            i == 1 &&
-                            game.getPieceAt(possibleMoveCandidates[0]) == null &&
-                            isFirstMove
-                    ) {
-                        addNormalMove(possibleMoves, this.square, candidate);
+                        if (isFirstMove &&
+                                game.getPieceAt(possibleMoveCandidates[0]) == null) {
+                            if (!isEnemy(game, candidate)) {
+                                // normal move
+                                addNormalMove(possibleMoves, this.square, candidate);
+                            }
+                        }
+                    } else {
+                        if (isEnemy(game, candidate)) {
+                            addAttackMove(possibleMoves, this.square, candidate, game);
+                        }
                     }
-                } else {
-                    // attack
-                    addAttackMove(possibleMoves, this.square, candidate, game);
-                }
             }
 
         }

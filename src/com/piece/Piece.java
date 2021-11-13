@@ -61,12 +61,14 @@ public abstract class Piece {
     public abstract Set<Move> findPossibleMoves(Game game);
 
     protected void addNormalMove(Set<Move> moves, Square from, Square to) {
-        moves.add(new Move(from, to));
+        Square newTo = new Square(to);
+        moves.add(new Move(from, newTo));
     }
 
     protected void addAttackMove(Set<Move> moves, Square from, Square to, Game game) {
         Piece enemy = game.getPieceAt(to);
-        moves.add(new AttackMove(from, to, enemy));
+        Square newTo = new Square(to);
+        moves.add(new AttackMove(from, newTo, enemy));
     }
 
     protected final boolean isNotAlly (Game game, Square to) {

@@ -62,41 +62,44 @@ public class Rook extends Piece {
         // TODO: work on castling
         for (Square candidate : possibleMoveCandidates) {
 
-            // while the candidate to check is within board border
-            while (candidate.isWithinBorder()) {
+            currCandidate: {
+                // while the candidate to check is within board border
+                while (candidate.isWithinBorder()) {
 
-                // if that candidate is not an ally, add that candidate
-                if (isNotAlly(game, candidate)) {
-                    // if that candidate is an enemy, add an attack move,
-                    // then move to next possibleMoveCandidate
-                    if (isEnemy(game, candidate)) {
-                        addAttackMove(possibleMoves, this.square, candidate, game);
-                    } else {
-                        // if that candidate is not an enemy, add a normal move,
-                        addNormalMove(possibleMoves, this.square, candidate);
-                        // then search 1 further square with the same direction
-                        int candidateRank = candidate.getRank();
-                        int candidateFile = candidate.getFile();
+                    // if that candidate is not an ally, add that candidate
+                    if (isNotAlly(game, candidate)) {
+                        // if that candidate is an enemy, add an attack move,
+                        // then move to next possibleMoveCandidate
+                        if (isEnemy(game, candidate)) {
+                            addAttackMove(possibleMoves, this.square, candidate, game);
+                            break currCandidate;
+                        } else {
+                            // if that candidate is not an enemy, add a normal move,
+                            addNormalMove(possibleMoves, this.square, candidate);
+                            // then search 1 further square with the same direction
+                            int candidateRank = candidate.getRank();
+                            int candidateFile = candidate.getFile();
 
-                        // up
-                        if (candidateRank > currRank && candidateFile == currFile) {
-                            candidate.addRank(1);
-                            // right
-                        } else if (candidateRank == currRank && candidateFile > currFile) {
-                            candidate.addFile(1);
-                            // down
-                        } else if (candidateRank < currRank && candidateFile == currFile) {
-                            candidate.addRank(-1);
-                            // left
-                        } else if (candidateRank == currRank && candidateFile < currFile) {
-                            candidate.addFile(-1);
+                            // up
+                            if (candidateRank > currRank && candidateFile == currFile) {
+                                candidate.addRank(1);
+                                // right
+                            } else if (candidateRank == currRank && candidateFile > currFile) {
+                                candidate.addFile(1);
+                                // down
+                            } else if (candidateRank < currRank && candidateFile == currFile) {
+                                candidate.addRank(-1);
+                                // left
+                            } else if (candidateRank == currRank && candidateFile < currFile) {
+                                candidate.addFile(-1);
+                            }
                         }
+                    } else {
+                        // if that candidate is an ally, move to next possibleMoveCandidate
+                        break currCandidate;
                     }
-                } else {
-                    // if that candidate is an ally, move to next possibleMoveCandidate
-                    break;
-                }
 
+                }
             }
 
         }
