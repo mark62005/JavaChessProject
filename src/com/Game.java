@@ -16,7 +16,7 @@ public class Game {
 
     private Game() {
         this.whitePlayer = new Player(Color.WHITE);
-        this.blackPlayer = new Player(Color.BLACK);;
+        this.blackPlayer = new Player(Color.BLACK);
 
         // initialize the board
         this.board = new Piece[8][8];
@@ -158,7 +158,11 @@ public class Game {
 
         Map<Square, Set<Move>> allPossibleMoves = new HashMap<>();
         for (Piece piece : pieces) {
-            allPossibleMoves.put(piece.getSquare(), piece.findPossibleMoves(this));
+            Set<Move> possibleMoves = piece.findPossibleMoves(this);
+            // only add it when there are possible moves for that piece
+            if (!possibleMoves.isEmpty()) {
+                allPossibleMoves.put(piece.getSquare(), possibleMoves);
+            }
         }
 
         if (allPossibleMoves.isEmpty()) {
@@ -182,6 +186,7 @@ public class Game {
             throw new IllegalArgumentException("Invalid Input. This square is not a valid move.");
         }
 
+        // TODO: work on conditions
         // check if it is a non-normal move,
         // if true, set "move" to be that non-normal move
         for (Move m : possibleMoves) {

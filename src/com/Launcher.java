@@ -164,13 +164,13 @@ public class Launcher {
     public static void printMovesForSquare(Scanner scanner, Game game, String userInput) {
         try {
             Square square = Square.parse(userInput);
-            Set<Square> possibleMoveDestinations = getPossibleMoveDestinations(game, square);
 
-            if (possibleMoveDestinations.isEmpty()) {
+            Set<Move> possibleMoves = game.getPossibleMovesForPieceAt(square);
+            if (possibleMoves.isEmpty()) {
                 System.out.printf("No possible move for %s.\n", userInput);
             } else {
-                System.out.printf("Possible moves for %s:\n", userInput);
-                System.out.println(possibleMoveDestinations);
+                Color colorToMove = game.getColorToMove();
+                printPossibleMoveDestinations(possibleMoves, square, colorToMove);
             }
         } catch (IllegalArgumentException e) {
             System.out.println(e.getLocalizedMessage());
@@ -178,28 +178,34 @@ public class Launcher {
         }
     }
 
-    public static Set<Square> getPossibleMoveDestinations(Game game, Square square) {
-        Set<Move> possibleMoves = game.getPossibleMovesForPieceAt(square);
+    public static void printPossibleMoveDestinations(Set<Move> possibleMoves, Square from, Color colorToMove) {
+        Set<Square> possibleMoveDestinations =
+                possibleMoves.stream()
+                            .map(Move::getTo)
+                            // sort the moves by the rank of the destination square
+                            .sorted(Comparator.comparingInt(Square::getRank))
+                            .collect(Collectors.toCollection(LinkedHashSet::new));
 
-        if (game.getColorToMove().equals(Color.WHITE)) {
-            return possibleMoves.stream()
-                    .map(Move::getTo)
-                    // sort the moves by the rank of the destination square
-                    .sorted(Comparator.comparingInt(Square::getRank))
-                    .collect(Collectors.toCollection(LinkedHashSet::new));
+        if (colorToMove.equals(Color.BLACK)) {
+            possibleMoveDestinations =
+                    possibleMoves.stream()
+                                .map(Move::getTo)
+                                // sort the moves by the rank of the destination square
+                                .sorted(Comparator.comparingInt(Square::getRank).reversed())
+                                .collect(Collectors.toCollection(LinkedHashSet::new));
         }
-        return possibleMoves.stream()
-                .map(Move::getTo)
-                // sort the moves by the rank of the destination square
-                .sorted(Comparator.comparingInt(Square::getRank).reversed())
-                .collect(Collectors.toCollection(LinkedHashSet::new));
+
+        System.out.printf("Possible moves for %s:\n", from);
+        System.out.println(possibleMoveDestinations);
     }
 
     public static void printAllPossibleMoves(Game game) {
         Map<Square, Set<Move>> allPossibleMoves = game.getAllPossibleMoves();
-
-        // TODO: print all possible moves
-        System.out.println("All possible moves...");
+        // TODO: sort the map keys
+        for (Map.Entry<Square, Set<Move>> entry : allPossibleMoves.entrySet()) {
+            Square square = entry.getKey();
+            printPossibleMoveDestinations(entry.getValue(), square, game.getColorToMove());
+        }
     }
 
     // TODO: work on draw
