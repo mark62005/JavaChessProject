@@ -88,13 +88,16 @@ public class Game {
             // 1st rank
             Square squareAtR1 = new Square(r1, i);
             switch (i) {
-                case 0, 7:
+                case 0:
+                case 7:
                     initializeAPiece(new Rook(isWhite), squareAtR1);
                     break;
-                case 1, 6:
+                case 1:
+                case 6:
                     initializeAPiece(new Knight(isWhite), squareAtR1);
                     break;
-                case 2, 5:
+                case 2:
+                case 5:
                     initializeAPiece(new Bishop(isWhite), squareAtR1);
                     break;
                 case 3:
