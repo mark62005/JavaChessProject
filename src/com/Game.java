@@ -182,6 +182,14 @@ public class Game {
             throw new IllegalArgumentException("Invalid Input. This square is not a valid move.");
         }
 
+        // check if it is a non-normal move,
+        // if true, set "move" to be that non-normal move
+        for (Move m : possibleMoves) {
+            if (m.getTo().equals(move.getTo())) {
+                System.out.println(m);
+                move = m;
+            }
+        }
         // perform a move
         move.makeAMove(this, myPiece);
 
@@ -189,6 +197,12 @@ public class Game {
         checkWin();
         // switch the player after each move
         switchPlayer();
+    }
+
+    private boolean isValidMove(Set<Move> possibleMoves, Square to) {
+
+
+        return true;
     }
 
     private boolean canPromote(Piece pawn, int rank) {

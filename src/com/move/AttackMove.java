@@ -16,6 +16,11 @@ public class AttackMove extends Move {
         this.enemy = enemy;
     }
 
+    public AttackMove(Move move, Piece enemy) {
+        super(move.getFrom(), move.getTo());
+        this.enemy = enemy;
+    }
+
     @Override
     public void makeAMove(Game game, Piece myPiece) {
         super.makeAMove(game, myPiece);

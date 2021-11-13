@@ -64,7 +64,7 @@ public class Pawn extends Piece {
 
     @Override
     public void move() {
-        System.out.println("One square");
+        System.out.println("Forward 1");
     }
 
     @Override

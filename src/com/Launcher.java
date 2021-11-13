@@ -14,6 +14,9 @@ public class Launcher {
         Scanner scanner = new Scanner(System.in);
         Game game = Game.getInstance();
 
+        game.setPieceAt(new Square(1, 3), null);
+        game.setPieceAt(new Square(6, 3), null);
+
         // start the game
         printStartMessage();
         printBoard(game);
@@ -166,7 +169,7 @@ public class Launcher {
             if (possibleMoveDestinations.isEmpty()) {
                 System.out.printf("No possible move for %s.\n", userInput);
             } else {
-                System.out.printf("Possible moves for %s\n", userInput);
+                System.out.printf("Possible moves for %s:\n", userInput);
                 System.out.println(possibleMoveDestinations);
             }
         } catch (IllegalArgumentException e) {
@@ -177,9 +180,19 @@ public class Launcher {
 
     public static Set<Square> getPossibleMoveDestinations(Game game, Square square) {
         Set<Move> possibleMoves = game.getPossibleMovesForPieceAt(square);
+
+        if (game.getColorToMove().equals(Color.WHITE)) {
+            return possibleMoves.stream()
+                    .map(Move::getTo)
+                    // sort the moves by the rank of the destination square
+                    .sorted(Comparator.comparingInt(Square::getRank))
+                    .collect(Collectors.toCollection(LinkedHashSet::new));
+        }
         return possibleMoves.stream()
                 .map(Move::getTo)
-                .collect(Collectors.toSet());
+                // sort the moves by the rank of the destination square
+                .sorted(Comparator.comparingInt(Square::getRank).reversed())
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     public static void printAllPossibleMoves(Game game) {
