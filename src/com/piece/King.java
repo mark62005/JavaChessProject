@@ -1,11 +1,11 @@
 package com.piece;
 
-import com.Color;
 import com.Game;
 import com.Square;
-import com.move.AttackMove;
+import com.move.CastleSide;
 import com.move.Move;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -27,7 +27,7 @@ public class King extends Piece {
         }
     }
 
-    public boolean isCanCastling() {
+    public boolean canCastling() {
         return canCastling;
     }
 
@@ -63,7 +63,7 @@ public class King extends Piece {
                 // left
                 new Square(currRank, currFile - 1),
                 // upper left
-                new Square(currRank + 1, currFile - 1),
+                new Square(currRank + 1, currFile - 1)
         };
 
         for (Square candidate : possibleMoveCandidates) {
@@ -71,15 +71,68 @@ public class King extends Piece {
                 // if the candidate square is an enemy, add an attack move
                 if (isEnemy(game, candidate)) {
                     addAttackMove(possibleMoves, this.square, candidate, game);
-                } else if (true) {
-                    // TODO: work on castling
                 } else {
                     // else, add a normal move
                     addNormalMove(possibleMoves, this.square, candidate);
                 }
             }
         }
+        addCastlingMoves(game, possibleMoves);
         return possibleMoves;
+    }
+
+    private void addCastlingMoves(Game game, Set<Move> possibleMoves) {
+        int rank = 0;
+        if (!this.isWhite) {
+            rank = 7;
+        }
+        addCastlingMove(game, possibleMoves, CastleSide.KING_SIDE, rank);
+        addCastlingMove(game, possibleMoves, CastleSide.QUEEN_SIDE, rank);
+    }
+
+    private void addCastlingMove(Game game, Set<Move> possibleMoves, CastleSide side, int rank) {
+        Square finalRookSquare = new Square(rank, side.getFinalRookFile());
+        Square finalKingSquare = new Square(rank, side.getFinalKingFile());
+
+        if (
+                game.isRookAndKingAtInitialPosition() &&
+                isNotInCheck(game) &&
+                isClear(game, side, rank) &&
+                isNotCastlingThroughCheck(game, finalRookSquare) &&
+                isNotCastlingToCheck(game, finalKingSquare)
+        ) {
+            addCastlingMove(possibleMoves, this.square, finalKingSquare, side);
+        }
+    }
+
+    private boolean isNotInCheck(Game game) {
+        return game.isNotInCheck(this.isWhite, this.square);
+    }
+
+    // check if the squares between King and Rook are empty
+    private boolean isClear(Game game, CastleSide side, int rank) {
+        Square[] castleSideCandidates = {
+                new Square(rank, side.getFinalKingFile()),
+                new Square(rank, side.getFinalRookFile()),
+        };
+        if (side.equals(CastleSide.QUEEN_SIDE)) {
+            castleSideCandidates = new Square[]{
+                    new Square(rank, side.getFinalKingFile()),
+                    new Square(rank, side.getFinalRookFile()),
+                    new Square(rank, 1),
+            };
+        }
+
+        return Arrays.stream(castleSideCandidates)
+                .allMatch(s -> game.getPieceAt(s) == null);
+    }
+
+    private boolean isNotCastlingThroughCheck(Game game, Square finalRookSquare) {
+        return game.isNotInCheck(this.isWhite, finalRookSquare);
+    }
+
+    private boolean isNotCastlingToCheck(Game game, Square finalKingSquare) {
+        return game.isNotInCheck(this.isWhite, finalKingSquare);
     }
 
     @Override

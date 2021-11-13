@@ -28,7 +28,7 @@ public class Rook extends Piece {
         }
     }
 
-    public boolean CanCastling() {
+    public boolean canCastling() {
         return canCastling;
     }
 
@@ -59,7 +59,6 @@ public class Rook extends Piece {
                 new Square(currRank, currFile - 1),
         };
 
-        // TODO: work on castling
         for (Square candidate : possibleMoveCandidates) {
 
             currCandidate: {

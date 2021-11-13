@@ -1,11 +1,12 @@
 package com;
 
 import com.move.Move;
-import com.move.PawnPromotion;
 import com.piece.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.piece.PieceValue.*;
 
 public class Game {
 
@@ -148,18 +149,33 @@ public class Game {
         }
 
         Map<Square, Set<Move>> allPossibleMoves = new HashMap<>();
-        for (Piece piece : pieces) {
-            Set<Move> possibleMoves = piece.findPossibleMoves(this);
-            // only add it when there are possible moves for that piece
-            if (!possibleMoves.isEmpty()) {
-                allPossibleMoves.put(piece.getSquare(), possibleMoves);
-            }
-        }
+        putPossibleMovesToMap(allPossibleMoves, pieces);
 
         if (allPossibleMoves.isEmpty()) {
             throw new IllegalArgumentException("Invalid input, you have no possible moves.");
         }
         return allPossibleMoves;
+    }
+
+    public Map<Square, Set<Move>> getAllPossibleMoves(Player player) {
+        List<Piece> pieces = player.getPieces();
+
+        Map<Square, Set<Move>> allPossibleMoves = new HashMap<>();
+        putPossibleMovesToMap(allPossibleMoves, pieces);
+        return allPossibleMoves;
+    }
+
+    private void putPossibleMovesToMap(Map<Square, Set<Move>> map, List<Piece> pieces) {
+        for (Piece piece : pieces) {
+            // a King cannot directly check the opponent's King
+            if (piece.getValue() != KING_VALUE) {
+                Set<Move> possibleMoves = piece.findPossibleMoves(this);
+                // only add it when there are possible moves for that piece
+                if (!possibleMoves.isEmpty()) {
+                    map.put(piece.getSquare(), possibleMoves);
+                }
+            }
+        }
     }
 
     public void makeAMove(String condition, Move move) {
@@ -221,7 +237,7 @@ public class Game {
         }
     }
 
-    // check if all of my possible moves contains opponent's King Square
+    // check if all of my possible moves contains opponent's King Position
     public boolean isInCheck() {
         Player opponent = blackPlayer;
         if (colorToMove.equals(Color.BLACK)) {
@@ -231,8 +247,22 @@ public class Game {
 
         Map<Square, Set<Move>> myPossibleMoves = getAllPossibleMoves();
         // flatten the "all my possible moves" map, then
-        // check if it contains all possible King moves of opponent
+        // check if it contains King's position
         return getFlattenPossibleDestinations(myPossibleMoves).contains(opponentKingPos);
+    }
+
+    // check if all of opponent's possible moves contains opponent's King Position
+    public boolean isNotInCheck(boolean isWhite, Square currSquare) {
+        Player opponent;
+        if (isWhite) {
+            opponent = blackPlayer;
+        } else {
+            opponent = whitePlayer;
+        }
+
+        Map<Square, Set<Move>> opponentPossibleMoves = getAllPossibleMoves(opponent);
+        // check if it contains King's position
+        return !getFlattenPossibleDestinations(opponentPossibleMoves).contains(currSquare);
     }
 
     public boolean isCheckMate() {
@@ -285,6 +315,36 @@ public class Game {
 
         // TODO: work on draw
         return null;
+    }
+
+    public boolean isRookAndKingAtInitialPosition() {
+        List<Piece> myPieces = whitePlayer.getPieces();
+        if (colorToMove.equals(Color.BLACK)) {
+            myPieces = blackPlayer.getPieces();
+        }
+
+        for (Piece piece : myPieces) {
+            if (isRook(piece)) {
+                Rook rook = (Rook) piece;
+                if (!rook.canCastling()) {
+                    return false;
+                }
+            } else if (isKing(piece)) {
+                King king = (King) piece;
+                if (!king.canCastling()) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private boolean isRook(Piece piece) {
+        return piece.getValue() == ROOK_VALUE;
+    }
+
+    private boolean isKing(Piece piece) {
+        return piece.getValue() == KING_VALUE;
     }
     
 }
