@@ -18,8 +18,8 @@ public class Game {
     private Termination termination;
 
     private Game() {
-        this.whitePlayer = new Player(Color.WHITE);
-        this.blackPlayer = new Player(Color.BLACK);
+        this.whitePlayer = new Player();
+        this.blackPlayer = new Player();
 
         // initialize the board
         this.board = new Piece[8][8];
@@ -301,7 +301,6 @@ public class Game {
                 .anyMatch(getFlattenPossibleMovesMap(opponentPossibleMoves)::contains);
     }
 
-    // TODO: use Termination
     public void checkWin() {
         if (isCheckMate()) {
             termination = Termination.winByCheckmate(colorToMove);

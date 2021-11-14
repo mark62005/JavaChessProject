@@ -24,7 +24,6 @@ public class Launcher {
             readMove(scanner, game);
         }
 
-        // TODO: use Termination
         // when the game has ended
         System.out.println(getTerminationDescription(game));
         System.exit(0);
@@ -93,7 +92,6 @@ public class Launcher {
                 } else if (isUciPattern(userInput) || isPromotionPattern(userInput)) {
                     performMove(scanner, game, userInput);
                 } else {
-                    // TODO: write invalid input message
                     System.out.println("Invalid input format. Type 'help' for help.");
                     // start the function again
                     readMove(scanner, game);
@@ -167,7 +165,6 @@ public class Launcher {
 
         // make sure it is a valid input format
         if (!isValidInputFormat(userInput)) {
-            // TODO: write invalid input message
             System.out.println("Invalid input format. Type 'help' for help.");
             return getUserInput(scanner, game);
         }
