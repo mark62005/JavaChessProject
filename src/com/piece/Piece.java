@@ -12,7 +12,6 @@ public abstract class Piece {
     protected boolean isWhite;
     protected Square square;
     protected char symbol;
-    protected Move prevMove;    // don't delete, use for checking en passant
 
     public Piece(int value, boolean isWhite) {
         this.value = value;
@@ -47,14 +46,6 @@ public abstract class Piece {
         this.square = square;
     }
 
-    public Move getPrevMove() {
-        return prevMove;
-    }
-
-    public void setPrevMove(Move prevMove) {
-        this.prevMove = prevMove;
-    }
-
     public abstract void move();
 
     public abstract Set<Move> findPossibleMoves(Game game);
@@ -70,33 +61,19 @@ public abstract class Piece {
         moves.add(new AttackMove(from, newTo, enemy));
     }
 
-    protected void addPromotionMove(Set<Move> moves, Square from, Square to, char promoteTo) {
-        Piece newPiece;
-        switch (promoteTo) {
-            case 'k':
-                newPiece = new Knight(this.isWhite);
-                break;
-            case 'b':
-                newPiece = new Bishop(this.isWhite);
-                break;
-            case 'r':
-                newPiece = new Rook(this.isWhite);
-                break;
-            case 'q':
-                newPiece = new Queen(this.isWhite);
-                break;
-            default:
-                throw new IllegalArgumentException("Invalid input. A pawn cannot be promoted to a King or a Pawn.");
-        }
-
-        newPiece.setSquare(this.square);
-        newPiece.setPrevMove(this.prevMove);
-        moves.add(new PawnPromotion(from, to, newPiece));
+    protected void addPromotionMove(Set<Move> moves, Square from, Square to) {
+        Queen queen = new Queen(isWhite);
+        queen.setSquare(square);
+        moves.add(new PawnPromotion(from, to, queen));
     }
 
     protected void addCastlingMove(Set<Move> moves, Square from, Square to, CastleSide side) {
         Square newTo = new Square(to);
         moves.add(new Castling(from, newTo, side));
+    }
+
+    protected void addEnPassantMove(Set<Move> moves, Square from, Square to, Pawn enemy) {
+        moves.add(new EnPassant(from, to, enemy));
     }
 
     protected final boolean isNotAlly (Game game, Square to) {

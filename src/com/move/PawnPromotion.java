@@ -2,16 +2,13 @@ package com.move;
 
 import com.Color;
 import com.Game;
-import com.InputValidators;
 import com.Square;
 import com.piece.*;
 
 import java.util.List;
 
-// TODO
 public class PawnPromotion extends Move implements Attack {
     private Piece promoteTo;
-    private Piece enemy;
 
     public PawnPromotion(Square from, Square to, Piece promoteTo) {
         super(from, to);

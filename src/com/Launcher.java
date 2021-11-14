@@ -17,11 +17,17 @@ public class Launcher {
         Game game = Game.getInstance();
 
 //        // test
-        game.setPieceAt(new Square(0, 1), null);
-        game.setPieceAt(new Square(0, 2), null);
-        game.setPieceAt(new Square(0, 3), null);
-        game.setPieceAt(new Square(7, 5), null);
-        game.setPieceAt(new Square(7, 6), null);
+//        game.setPieceAt(new Square(0, 1), null);
+//        game.setPieceAt(new Square(0, 2), null);
+//        game.setPieceAt(new Square(0, 3), null);
+//        game.setPieceAt(new Square(7, 5), null);
+//        game.setPieceAt(new Square(7, 6), null);
+        Pawn p1 = new Pawn(false);
+        p1.setSquare(new Square(3, 3));
+//        p1.setCanEnPassant(true);
+        game.setPieceAt(new Square(6, 3), null);
+        game.setPieceAt(new Square(3, 3), p1);
+        game.getBlackPlayer().getPieces().add(p1);
 
         // start the game
         printStartMessage();
@@ -165,6 +171,14 @@ public class Launcher {
         return !myPieces.contains(piece);
     }
 
+    public static boolean isNotMyPiece(Game game, Square square) {
+        List<Piece> pieces = game.getWhitePlayer().getPieces();
+        if (game.getColorToMove().equals(Color.BLACK)) {
+            pieces = game.getBlackPlayer().getPieces();
+        }
+        return pieces.stream().noneMatch(p -> p.getSquare().equals(square));
+    }
+
     public static String getUserInput(Scanner scanner, Game game) {
         printQuestion(game);
         String userInput = scanner.nextLine().trim().toLowerCase(Locale.ROOT);
@@ -207,6 +221,12 @@ public class Launcher {
     public static void printMovesForSquare(Scanner scanner, Game game, String userInput) {
         try {
             Square square = Square.parse(userInput);
+
+            if (isNotMyPiece(game, square)) {
+                throw new IllegalArgumentException(
+                        "Invalid input. Please choose a " + game.getColorToMove().toString() + " piece."
+                );
+            }
 
             Set<Move> possibleMoves = game.getPossibleMovesForPieceAt(square);
             if (possibleMoves.isEmpty()) {

@@ -204,9 +204,18 @@ public class Game {
             // perform a move
             move.makeAMove(this, myPiece);
 
-            if (isInCheck()) {
-                System.out.println("Check.");
+            List<Piece> opponentPieces = blackPlayer.getPieces();
+            if (colorToMove.equals(Color.BLACK)) {
+                opponentPieces = whitePlayer.getPieces();
             }
+            for (Piece piece : opponentPieces) {
+                if (piece.getValue() == PAWN_VALUE) {
+                    Pawn pawn = (Pawn) piece;
+                    pawn.setCanBeCapturedByEnPassant(false);
+                    System.out.println(pawn);
+                }
+            }
+
             if (isCheckMate()) {
                 System.out.println("Check mate.");
             }
@@ -237,20 +246,6 @@ public class Game {
         }
     }
 
-    // check if all of my possible moves contains opponent's King Position
-    public boolean isInCheck() {
-        Player opponent = blackPlayer;
-        if (colorToMove.equals(Color.BLACK)) {
-            opponent = whitePlayer;
-        }
-        final Square opponentKingPos = opponent.getKingPos();
-
-        Map<Square, Set<Move>> myPossibleMoves = getAllPossibleMoves();
-        // flatten the "all my possible moves" map, then
-        // check if it contains King's position
-        return getFlattenPossibleDestinations(myPossibleMoves).contains(opponentKingPos);
-    }
-
     // check if all of opponent's possible moves contains opponent's King Position
     public boolean isNotInCheck(boolean isWhite, Square currSquare) {
         Player opponent;
@@ -266,10 +261,6 @@ public class Game {
     }
 
     public boolean isCheckMate() {
-        if (!isInCheck()) {
-            return false;
-        }
-
         Square opponentKingPos = blackPlayer.getKingPos();
         if (colorToMove.equals(Color.BLACK)) {
             opponentKingPos = whitePlayer.getKingPos();
@@ -280,6 +271,7 @@ public class Game {
                 opponentPossibleKingMoves.stream()
                         .map(Move::getTo)
                         .collect(Collectors.toSet());
+        opponentPossibleKingTos.add(opponentKingPos);
 
         // find all my possible move destinations
         Map<Square, Set<Move>> myPossibleMoves = getAllPossibleMoves();
