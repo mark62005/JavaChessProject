@@ -3,27 +3,13 @@ package com.move;
 import com.*;
 import com.piece.Piece;
 
-import java.util.Arrays;
-import java.util.Set;
-
 public class Castling extends Move {
 
-    private CastleSide castleSide;
+    private final CastleSide castleSide;
 
     public Castling(Square from, Square to, CastleSide castleSide) {
         super(from, to);
         this.castleSide = castleSide;
-    }
-
-    public static Castling parseCastlingUCI(String userInput) {
-        CastleSide castleSide = CastleSide.KING_SIDE;
-        if (!Arrays.asList(castleSide.getUcis()).contains(userInput)) {
-            castleSide = CastleSide.QUEEN_SIDE;
-        }
-
-        Square from = Square.parse(userInput.substring(0, 2));
-        Square to = Square.parse(userInput.substring(2, 4));
-        return new Castling(from, to, castleSide);
     }
 
     @Override
@@ -42,7 +28,7 @@ public class Castling extends Move {
         // update the square of myPiece
         rook.setSquare(finalRookSquare);
         // check for special conditions for future moves (e.g. Castling, En Passant and Promotion)
-        checkSpecialConditions(game, rook);
+        checkSpecialConditions(rook);
 
         // update board
         game.setPieceAt(finalRookSquare, rook);

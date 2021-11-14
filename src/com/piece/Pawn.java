@@ -77,7 +77,6 @@ public class Pawn extends Piece {
                 new Square(currRank + offset, currFile + 1),
         };
 
-        // TODO: work on en passant
         for (int i = 0; i < possibleMoveCandidates.length; i++) {
 
             Square candidate = possibleMoveCandidates[i];

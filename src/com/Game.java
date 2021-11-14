@@ -11,20 +11,22 @@ import static com.piece.PieceValue.*;
 public class Game {
 
     private static Game instance;
-    private Piece[][] board;
-    private Player whitePlayer;
-    private Player blackPlayer;
+    private final Piece[][] board;
+    private final Player whitePlayer;
+    private final Player blackPlayer;
     private Color colorToMove;
+    private Termination termination;
 
     private Game() {
-        this.whitePlayer = new Player(Color.WHITE);
-        this.blackPlayer = new Player(Color.BLACK);
+        this.whitePlayer = new Player();
+        this.blackPlayer = new Player();
 
         // initialize the board
         this.board = new Piece[8][8];
         initializeBoard();
 
         this.colorToMove = Color.WHITE;
+        this.termination = null;
     }
 
     public static Game getInstance() {
@@ -70,6 +72,9 @@ public class Game {
         this.colorToMove = colorToMove;
     }
 
+    public Termination getTermination() {
+        return termination;
+    }
     public void initializeBoard() {
         initializePieces(Color.WHITE);
         initializePieces(Color.BLACK);
@@ -140,23 +145,6 @@ public class Game {
         return piece.findPossibleMoves(this);
     }
 
-    public Map<Square, Set<Move>> getAllPossibleMoves() {
-        List<Piece> pieces;
-        if (colorToMove.equals(Color.WHITE)) {
-            pieces = whitePlayer.getPieces();
-        } else {
-            pieces = blackPlayer.getPieces();
-        }
-
-        Map<Square, Set<Move>> allPossibleMoves = new HashMap<>();
-        putPossibleMovesToMap(allPossibleMoves, pieces);
-
-        if (allPossibleMoves.isEmpty()) {
-            throw new IllegalArgumentException("Invalid input, you have no possible moves.");
-        }
-        return allPossibleMoves;
-    }
-
     public Map<Square, Set<Move>> getAllPossibleMoves(Player player) {
         List<Piece> pieces = player.getPieces();
 
@@ -191,7 +179,6 @@ public class Game {
                 // if true, set "move" to be that non-normal move
                 for (Move m : possibleMoves) {
                     if (m.getTo().equals(move.getTo())) {
-                        System.out.println(m);
                         move = m;
                     }
                 }
@@ -212,13 +199,9 @@ public class Game {
                 if (piece.getValue() == PAWN_VALUE) {
                     Pawn pawn = (Pawn) piece;
                     pawn.setCanBeCapturedByEnPassant(false);
-                    System.out.println(pawn);
                 }
             }
 
-            if (isCheckMate()) {
-                System.out.println("Check mate.");
-            }
             // check if anyone wins after each move
             checkWin();
             // switch the player after each move
@@ -257,14 +240,16 @@ public class Game {
 
         Map<Square, Set<Move>> opponentPossibleMoves = getAllPossibleMoves(opponent);
         // check if it contains King's position
-        return !getFlattenPossibleDestinations(opponentPossibleMoves).contains(currSquare);
+        return !getFlattenPossibleMovesMap(opponentPossibleMoves).contains(currSquare);
     }
 
     public boolean isCheckMate() {
-        Square opponentKingPos = blackPlayer.getKingPos();
+        Player opponent = blackPlayer;
         if (colorToMove.equals(Color.BLACK)) {
-            opponentKingPos = whitePlayer.getKingPos();
+            opponent = whitePlayer;
         }
+        Square opponentKingPos = opponent.getKingPos();
+
         // find possible move destinations for opponent's King
         Set<Move> opponentPossibleKingMoves = getPossibleMovesForPieceAt(opponentKingPos);
         Set<Square> opponentPossibleKingTos =
@@ -273,16 +258,21 @@ public class Game {
                         .collect(Collectors.toSet());
         opponentPossibleKingTos.add(opponentKingPos);
 
+        Player currPlayer = whitePlayer;
+        if (colorToMove.equals(Color.BLACK)) {
+            currPlayer = blackPlayer;
+        }
         // find all my possible move destinations
-        Map<Square, Set<Move>> myPossibleMoves = getAllPossibleMoves();
+        Map<Square, Set<Move>> myPossibleMoves = getAllPossibleMoves(currPlayer);
 
         // flatten the "all my possible moves" map, then
         // check if it contains all possible King moves of opponent
-        return getFlattenPossibleDestinations(myPossibleMoves).containsAll(opponentPossibleKingTos);
+        return getFlattenPossibleMovesMap(myPossibleMoves).containsAll(opponentPossibleKingTos) &&
+                !canEnemyCaptureMyCheckingPieces(opponent, myPossibleMoves, opponentKingPos);
     }
 
     // flatten the "all my possible moves" map, and return a set of possible destinations
-    private Set<Square> getFlattenPossibleDestinations(Map<Square, Set<Move>> possibleMovesMap) {
+    private Set<Square> getFlattenPossibleMovesMap(Map<Square, Set<Move>> possibleMovesMap) {
         Set<Square> flattenedMyPossibleTos = new HashSet<>();
         for (Set<Move> moves : possibleMovesMap.values()) {
             flattenedMyPossibleTos.addAll(
@@ -294,19 +284,31 @@ public class Game {
         return flattenedMyPossibleTos;
     }
 
-    // TODO: use Termination
-    // if opponent's King is captured, return my side
-    public Color checkWin() {
-        if (whitePlayer.isKingCaptured()) {
-            return Color.BLACK;
+    private boolean canEnemyCaptureMyCheckingPieces(Player opponent, Map<Square, Set<Move>> myPossibleMoves, Square opponentKingPos) {
+        Set<Square> myCheckingPiecePositions = new HashSet<>();
+        for (Set<Move> moves : myPossibleMoves.values()) {
+            myCheckingPiecePositions.addAll(
+                    moves.stream()
+                            .filter(m -> m.getTo().equals(opponentKingPos))
+                            .map(Move::getFrom)
+                            .collect(Collectors.toSet())
+            );
         }
 
-        if (blackPlayer.isKingCaptured()) {
-            return Color.WHITE;
-        }
+        Map<Square, Set<Move>> opponentPossibleMoves = getAllPossibleMoves(opponent);
+        // check if enemy can capture my checking piece
+        return myCheckingPiecePositions.stream()
+                .anyMatch(getFlattenPossibleMovesMap(opponentPossibleMoves)::contains);
+    }
 
-        // TODO: work on draw
-        return null;
+    public void checkWin() {
+        if (isCheckMate()) {
+            termination = Termination.winByCheckmate(colorToMove);
+        } else if (whitePlayer.isKingCaptured() || blackPlayer.isKingCaptured()) {
+            termination = Termination.winByCapturingKing(colorToMove);
+        } else {
+            // TODO: work on draw
+        }
     }
 
     public boolean isRookAndKingAtInitialPosition() {
@@ -337,6 +339,14 @@ public class Game {
 
     private boolean isKing(Piece piece) {
         return piece.getValue() == KING_VALUE;
+    }
+
+    public void resign(){
+        Color opponentColor = Color.BLACK;
+        if (colorToMove.equals(Color.BLACK)) {
+            opponentColor = Color.WHITE;
+        }
+        termination = Termination.winByCheckmate(opponentColor);
     }
     
 }

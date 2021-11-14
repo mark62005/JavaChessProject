@@ -1,9 +1,7 @@
 package com.piece;
 
-import com.Color;
 import com.Game;
 import com.Square;
-import com.move.AttackMove;
 import com.move.Move;
 
 import java.util.HashSet;

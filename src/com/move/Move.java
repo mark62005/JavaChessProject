@@ -3,7 +3,6 @@ package com.move;
 import com.*;
 import com.piece.*;
 
-import java.util.List;
 import java.util.Objects;
 
 import static com.piece.PieceValue.*;
@@ -27,7 +26,7 @@ public class Move {
 
     public void makeAMove(Game game, Piece myPiece) {
         // update myPiece
-        updateMyPiece(game, myPiece);
+        updateMyPiece(myPiece);
         // update the board
         updateBoard(game, myPiece);
 
@@ -38,14 +37,14 @@ public class Move {
 
     }
 
-    protected void updateMyPiece(Game game, Piece myPiece) {
+    protected void updateMyPiece(Piece myPiece) {
         // update the square of myPiece
         myPiece.setSquare(to);
         // check for special conditions for future moves (e.g. Castling, En Passant and Promotion)
-        checkSpecialConditions(game, myPiece);
+        checkSpecialConditions(myPiece);
     }
 
-    protected void checkSpecialConditions(Game game, Piece piece) {
+    protected void checkSpecialConditions(Piece piece) {
         int value = piece.getValue();
 
         if (value == KING_VALUE) {

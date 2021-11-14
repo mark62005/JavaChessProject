@@ -1,11 +1,8 @@
 package com.move;
 
-import com.Color;
 import com.Game;
-import com.Player;
 import com.Square;
 import com.piece.Piece;
-import com.piece.PieceValue;
 
 public class AttackMove extends Move implements Attack {
 
