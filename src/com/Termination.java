@@ -2,14 +2,16 @@ package com;
 
 public enum Termination {
     // TODO: work on termination message
-    WHITE_WON_CHECKMATE ("score"),
-    BLACK_WON_CHECKMATE ("score"),
-    WHITE_WON_RESIGNATION ("score"),
-    BLACK_WON_RESIGNATION ("score"),
-    DRAW_STALEMATE ("stalemate"),
-    DRAW_FIFTY_MOVE ("fifty move");
+    WHITE_WON ("Game over - 1-0 - White won"),
+    BLACK_WON ("Game over - 1-0 - Black won"),
+    WHITE_WON_CHECKMATE ("Game over - 1-0 - White won by checkmate"),
+    BLACK_WON_CHECKMATE ("Game over - 1-0 - Black won by checkmate"),
+    WHITE_WON_RESIGNATION ("Game over - 1-0 - White won by resignation"),
+    BLACK_WON_RESIGNATION ("Game over - 1-0 - Black won by resignation"),
+    DRAW_STALEMATE ("Game over - Draw by stalemate"),
+    DRAW_FIFTY_MOVE ("Game over - Draw by fifty-move");
 
-    private String score;
+    private final String score;
 
     Termination(String score) {
         this.score = score;
@@ -17,10 +19,6 @@ public enum Termination {
 
     public String getScore() {
         return score;
-    }
-
-    public void setScore(String score) {
-        this.score = score;
     }
 
     public static Termination winByCheckmate(Color color) {

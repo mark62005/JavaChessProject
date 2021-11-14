@@ -1,6 +1,5 @@
 package com;
 
-import java.util.Arrays;
 import java.util.regex.Pattern;
 
 public class InputValidators {
@@ -9,7 +8,6 @@ public class InputValidators {
     public static final String SQUARE_REGEX = "^[a-h][1-8]$";
     public static final String UCI_REGEX = "^([a-h][1-8]){2}$";
     public static final String PROMOTION_REGEX = "^([a-h][2,7])([a-h][1,8])[kbrq]$";
-    public static final String[] CASTLING_UCIS = { "e1c1", "e1g1", "e8c8", "e8g8" };
 
     private static final Pattern validInputFormat = Pattern.compile(VALID_INPUT_FORMAT_REGEX);
     private static final Pattern squarePattern = Pattern.compile(SQUARE_REGEX);
@@ -33,10 +31,6 @@ public class InputValidators {
 
     public static boolean isPromotionPattern(String userInput) {
         return promotionPattern.matcher(userInput).matches();
-    }
-
-    public static boolean isCastlingUCI(String userInput) {
-        return Arrays.asList(CASTLING_UCIS).contains(userInput);
     }
 
 }

@@ -2,8 +2,8 @@ package com;
 
 import com.move.Move;
 import com.move.PawnPromotion;
-import com.piece.Pawn;
 import com.piece.Piece;
+import com.piece.Queen;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -16,48 +16,35 @@ public class Launcher {
         Scanner scanner = new Scanner(System.in);
         Game game = Game.getInstance();
 
-//        // test
-//        game.setPieceAt(new Square(0, 1), null);
-//        game.setPieceAt(new Square(0, 2), null);
-//        game.setPieceAt(new Square(0, 3), null);
-//        game.setPieceAt(new Square(7, 5), null);
-//        game.setPieceAt(new Square(7, 6), null);
-        Pawn p1 = new Pawn(false);
-        p1.setSquare(new Square(3, 3));
-//        p1.setCanEnPassant(true);
+        // test
+        game.setPieceAt(new Square(1, 3), null);
         game.setPieceAt(new Square(6, 3), null);
-        game.setPieceAt(new Square(3, 3), p1);
-        game.getBlackPlayer().getPieces().add(p1);
 
         // start the game
         printStartMessage();
         printBoard(game);
 
         // when the game is running
-        while(!gameHasEnded(game)) {
+        while(game.getTermination() == null) {
             readMove(scanner, game);
         }
 
         // TODO: use Termination
         // when the game has ended
-        Color winner = game.checkWin();
-        if (winner.equals(Color.BLACK)) {
-            System.out.println("Black won.");
-        } else {
-            System.out.println("White won.");
-        }
+        System.out.println(getTerminationDescription(game));
+        System.exit(0);
     }
 
-    public static void printStartMessage() {
+    private static void printStartMessage() {
         System.out.println("Game start.");
     }
 
-    public static void printBoard(Game game) {
+    private static void printBoard(Game game) {
         printBody(game);
         printFooter();
     }
 
-    public static void printBody(Game game) {
+    private static void printBody(Game game) {
         Piece[][] board = game.getBoard();
 
         for (int i = board.length; i > 0; i--) {
@@ -75,14 +62,14 @@ public class Launcher {
         System.out.println();
     }
 
-    public static void printFooter() {
+    private static void printFooter() {
         for (int i = 97; i < 105; i++) {
             System.out.print((char) i + " ");
         }
         System.out.println();
     }
 
-    public static void readMove(Scanner scanner, Game game) {
+    private static void readMove(Scanner scanner, Game game) {
         String userInput = getUserInput(scanner, game);
         switch (userInput) {
             // * type 'help' for help
@@ -95,7 +82,7 @@ public class Launcher {
                 break;
             // * type 'resign' to resign
             case "resign":
-                resign();
+                resign(game);
                 break;
             // * type 'moves' to lists all possible moves
             case "moves":
@@ -112,7 +99,7 @@ public class Launcher {
                     performMove(scanner, game, userInput);
                 } else {
                     // TODO: write invalid input message
-                    System.out.println("Invalid input format.");
+                    System.out.println("Invalid input format. Type 'help' for help.");
                     // start the function again
                     readMove(scanner, game);
                 }
@@ -121,7 +108,7 @@ public class Launcher {
     }
 
     // TODO: make sure a pawn is being promoted if it's moving from the 2nd last Rank to last Rank
-    public static void performMove(Scanner scanner, Game game, String userInput) {
+    private static void performMove(Scanner scanner, Game game, String userInput) {
         try {
             // make a move other than promotion
             if (!isPromotionPattern(userInput)) {
@@ -160,7 +147,7 @@ public class Launcher {
         }
     }
 
-    public static boolean isNotMyPiece(Game game, Move move) {
+    private static boolean isNotMyPiece(Game game, Move move) {
         List<Piece> myPieces = game.getWhitePlayer().getPieces();
 
         if (game.getColorToMove().equals(Color.BLACK)) {
@@ -171,7 +158,7 @@ public class Launcher {
         return !myPieces.contains(piece);
     }
 
-    public static boolean isNotMyPiece(Game game, Square square) {
+    private static boolean isNotMyPiece(Game game, Square square) {
         List<Piece> pieces = game.getWhitePlayer().getPieces();
         if (game.getColorToMove().equals(Color.BLACK)) {
             pieces = game.getBlackPlayer().getPieces();
@@ -179,20 +166,20 @@ public class Launcher {
         return pieces.stream().noneMatch(p -> p.getSquare().equals(square));
     }
 
-    public static String getUserInput(Scanner scanner, Game game) {
+    private static String getUserInput(Scanner scanner, Game game) {
         printQuestion(game);
         String userInput = scanner.nextLine().trim().toLowerCase(Locale.ROOT);
 
         // make sure it is a valid input format
         if (!isValidInputFormat(userInput)) {
             // TODO: write invalid input message
-            System.out.println("Invalid input format.");
+            System.out.println("Invalid input format. Type 'help' for help.");
             return getUserInput(scanner, game);
         }
         return userInput;
     }
 
-    public static void printQuestion(Game game) {
+    private static void printQuestion(Game game) {
         System.out.printf(
                 "\n%s to move",
                 capitalize(game.getColorToMove().toString())
@@ -201,14 +188,14 @@ public class Launcher {
     }
 
     // capitalize a string
-    public static String capitalize(String str) {
+    private static String capitalize(String str) {
         if(str == null || str.isEmpty()) {
             return str;
         }
         return str.substring(0, 1).toUpperCase() + str.substring(1);
     }
 
-    public static void printHelp() {
+    private static void printHelp() {
         System.out.println("* type 'help' for help");
         System.out.println("* type 'board' to see the board again");
         System.out.println("* type 'resign' to resign");
@@ -217,8 +204,7 @@ public class Launcher {
         System.out.println("* type UCI (e.g. b1c3, e7e8q) to make a move");
     }
 
-    // TODO: think about more errors
-    public static void printMovesForSquare(Scanner scanner, Game game, String userInput) {
+    private static void printMovesForSquare(Scanner scanner, Game game, String userInput) {
         try {
             Square square = Square.parse(userInput);
 
@@ -241,7 +227,7 @@ public class Launcher {
         }
     }
 
-    public static void printPossibleMoveDestinations(Set<Move> possibleMoves, Square from, Color colorToMove) {
+    private static void printPossibleMoveDestinations(Set<Move> possibleMoves, Square from, Color colorToMove) {
         Set<Square> possibleMoveDestinations =
                 possibleMoves.stream()
                             .map(Move::getTo)
@@ -262,8 +248,13 @@ public class Launcher {
         System.out.println(possibleMoveDestinations);
     }
 
-    public static void printAllPossibleMoves(Game game) {
-        Map<Square, Set<Move>> allPossibleMoves = game.getAllPossibleMoves();
+    private static void printAllPossibleMoves(Game game) {
+        Player currPlayer = game.getWhitePlayer();
+        if (game.getColorToMove().equals(Color.BLACK)) {
+            currPlayer = game.getBlackPlayer();
+        }
+
+        Map<Square, Set<Move>> allPossibleMoves = game.getAllPossibleMoves(currPlayer);
         // TODO: sort the map keys
         for (Map.Entry<Square, Set<Move>> entry : allPossibleMoves.entrySet()) {
             Square square = entry.getKey();
@@ -271,19 +262,13 @@ public class Launcher {
         }
     }
 
-    // TODO: work on draw
-    public static boolean gameHasEnded(Game game) {
-        Color winner = game.checkWin();
-
-        if (winner == null) {
-            return false;
-        }
-        return winner.equals(Color.BLACK) || winner.equals(Color.WHITE);
+    private static void resign(Game game) {
+        game.resign();
+        System.out.println(getTerminationDescription(game));
+        System.exit(0);
     }
 
-    // TODO: use Termination
-    public static void resign() {
-        System.out.println("Resigned.");
-        System.exit(0);
+    private static String getTerminationDescription(Game game) {
+        return game.getTermination().getScore();
     }
 }

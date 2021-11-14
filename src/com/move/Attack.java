@@ -33,7 +33,6 @@ public interface Attack {
         if (enemy.getValue() == PieceValue.KING_VALUE) {
             opponent.setKingCaptured(true);
         }
-        System.out.println("attack");
     }
 
 }
