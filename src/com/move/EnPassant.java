@@ -2,10 +2,8 @@ package com.move;
 
 import com.Game;
 import com.Square;
-import com.piece.Pawn;
 import com.piece.Piece;
 
-// TODO
 public class EnPassant extends AttackMove {
     public EnPassant(Square from, Square to, Piece enemy) {
         super(from, to, enemy);
@@ -17,17 +15,22 @@ public class EnPassant extends AttackMove {
     }
 
     @Override
-    protected void updateMyPiece(Piece myPiece) {
-        Pawn pawn = (Pawn) myPiece;
-
-        pawn.setSquare(to);
-        pawn.setCanEnPassant(false);
-        pawn.setPrevMove(this);
+    public void captureEnemy(Game game, Square to) {
+        super.captureEnemy(game, enemy.getSquare());
     }
 
     @Override
     protected void updateBoard(Game game, Piece myPiece) {
         super.updateBoard(game, myPiece);
         game.setPieceAt(enemy.getSquare(), null);
+    }
+
+    @Override
+    public String toString() {
+        return "EnPassant{" +
+                " from=" + from +
+                ", to=" + to +
+                ", enemy=" + enemy +
+                '}';
     }
 }

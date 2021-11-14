@@ -16,37 +16,16 @@ public class AttackMove extends Move implements Attack {
         this.enemy = enemy;
     }
 
-    public AttackMove(Move move, Piece enemy) {
-        super(move.getFrom(), move.getTo());
-        this.enemy = enemy;
-    }
-
     @Override
     public void makeAMove(Game game, Piece myPiece) {
         super.makeAMove(game, myPiece);
-        captureEnemy(game, to);
     }
 
-//    protected Player getOpponent(Game game) {
-//        if (game.getColorToMove().equals(Color.WHITE)) {
-//            return game.getBlackPlayer();
-//        }
-//        return game.getWhitePlayer();
-//    }
-//
-//    protected void captureEnemy(Game game) {
-//        Player opponent = getOpponent(game);
-//        for (Piece piece : opponent.getPieces()) {
-//            if (enemy.equals(piece)) {
-//                opponent.getPieces().remove(enemy);
-//                break;
-//            }
-//        }
-//        // capture King
-//        if (enemy.getValue() == PieceValue.KING_VALUE) {
-//            opponent.setKingCaptured(true);
-//        }
-//    }
+    @Override
+    protected void updateBoard(Game game, Piece myPiece) {
+        captureEnemy(game, to);
+        super.updateBoard(game, myPiece);
+    }
 
     @Override
     public String toString() {

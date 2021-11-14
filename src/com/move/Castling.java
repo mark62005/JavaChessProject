@@ -42,7 +42,7 @@ public class Castling extends Move {
         // update the square of myPiece
         rook.setSquare(finalRookSquare);
         // check for special conditions for future moves (e.g. Castling, En Passant and Promotion)
-        checkSpecialConditions(rook);
+        checkSpecialConditions(game, rook);
 
         // update board
         game.setPieceAt(finalRookSquare, rook);

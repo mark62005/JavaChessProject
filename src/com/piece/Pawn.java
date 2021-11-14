@@ -1,24 +1,26 @@
 package com.piece;
 
-import com.Color;
 import com.Game;
 import com.Square;
-import com.move.AttackMove;
 import com.move.Move;
 
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 
+import static com.piece.PawnRank.*;
+
 public class Pawn extends Piece {
+
     private boolean isFirstMove;
     private boolean canEnPassant;
+    private boolean canBeCapturedByEnPassant;
 
     public Pawn(boolean isWhite) {
         super(PieceValue.PAWN_VALUE, isWhite);
         setSymbol(isWhite);
         this.isFirstMove = true;
         this.canEnPassant = false;
+        this.canBeCapturedByEnPassant = false;
     }
 
     @Override
@@ -34,12 +36,16 @@ public class Pawn extends Piece {
         isFirstMove = firstMove;
     }
 
-    public boolean canEnPassant() {
-        return canEnPassant;
-    }
-
     public void setCanEnPassant(boolean canEnPassant) {
         this.canEnPassant = canEnPassant;
+    }
+
+    public boolean canBeCapturedByEnPassant() {
+        return canBeCapturedByEnPassant;
+    }
+
+    public void setCanBeCapturedByEnPassant(boolean canBeCapturedByEnPassant) {
+        this.canBeCapturedByEnPassant = canBeCapturedByEnPassant;
     }
 
     @Override
@@ -51,12 +57,12 @@ public class Pawn extends Piece {
     public Set<Move> findPossibleMoves(Game game) {
         Set<Move> possibleMoves = new HashSet<>();
 
-        int currRank = this.square.getRank();
-        int currFile = this.square.getFile();
+        int currRank = square.getRank();
+        int currFile = square.getFile();
         // if the piece is white, moves upward
         int offset = 1;
         // if the piece is black, moves downward
-        if (!this.isWhite) {
+        if (!isWhite) {
             offset = -1;
         }
         // https://en.wikipedia.org/wiki/Pawn_(chess)
@@ -77,31 +83,31 @@ public class Pawn extends Piece {
             Square candidate = possibleMoveCandidates[i];
             if (candidate.isWithinBorder() && isNotAlly(game, candidate)) {
                     if (i == 0) {
-                        if (
-                                this.isWhite && candidate.getRank() == 7 ||
-                                !this.isWhite && candidate.getRank() == 0
-                        ) {
-                            addPromotionMove(possibleMoves, this.square, candidate, 'q');
+
+                        int lastRank = getLastRank();
+                        if (candidate.getRank() == lastRank) {
+                            // add promotion move
+                            addPromotionMove(possibleMoves, square, candidate);
                         } else {
                             if (!isEnemy(game, candidate)) {
                                 // normal move
-                                addNormalMove(possibleMoves, this.square, candidate);
+                                addNormalMove(possibleMoves, square, candidate);
                             }
                         }
 
                     } else if (i == 1) {
+                        Square frontSquare = possibleMoveCandidates[0];
                         // pawn jump
-                        if (isFirstMove &&
-                                game.getPieceAt(possibleMoveCandidates[0]) == null) {
-                            if (!isEnemy(game, candidate)) {
-                                // normal move
-                                addNormalMove(possibleMoves, this.square, candidate);
-                            }
+                        if (
+                                isFirstMove &&
+                                isOnInitialSquare() &&
+                                isNotBlocked(game, frontSquare) &&
+                                !isEnemy(game, candidate)
+                        ) {
+                            addNormalMove(possibleMoves, square, candidate);
                         }
                     } else {
-                        if (isEnemy(game, candidate)) {
-                            addAttackMove(possibleMoves, this.square, candidate, game);
-                        }
+                        checkAttackMoveConditions(game, possibleMoves, candidate);
                     }
             }
 
@@ -109,18 +115,72 @@ public class Pawn extends Piece {
         return possibleMoves;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
-        Pawn pawn = (Pawn) o;
-        return isFirstMove == pawn.isFirstMove && canEnPassant == pawn.canEnPassant;
+    public int getLastRank() {
+        if (isWhite) {
+            return WHITE_PAWN_LAST_RANK;
+        }
+        return BLACK_PAWN_LAST_RANK;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), isFirstMove, canEnPassant);
+    public int getJumpedRank() {
+        if (isWhite) {
+            return WHITE_PAWN_JUMPED_RANK;
+        }
+        return BLACK_PAWN_JUMPED_RANK;
+    }
+
+    private void checkAttackMoveConditions(Game game, Set<Move> possibleMoves, Square candidate) {
+        Pawn enemy = getEnemyPawnBeside(game, candidate);
+        // check if that candidate matches the conditions to perform En Passant
+        if (
+                canEnPassant &&
+                isOnFifthRank() &&
+                enemy != null &&
+                enemy.canBeCapturedByEnPassant()
+        ) {
+            addEnPassantMove(possibleMoves, square, candidate, enemy);
+        } else if (isEnemy(game, candidate)) {
+            // else,
+            // check if it matches the condition to perform a normal attack move
+            addAttackMove(possibleMoves, square, candidate, game);
+        }
+    }
+
+    private int getFifthRank() {
+        if (isWhite) {
+            return WHITE_PAWN_FIFTH_RANK;
+        }
+        return BLACK_PAWN_FIFTH_RANK;
+    }
+
+    public boolean isOnFifthRank() {
+        return square.getRank() == getFifthRank();
+    }
+
+    public Pawn getEnemyPawnBeside(Game game, Square candidate) {
+        Square enemySquare = new Square(getFifthRank(), candidate.getFile());
+        if (enemySquare.isWithinBorder()) {
+            Piece enemy = game.getPieceAt(enemySquare);
+            if (isEnemy(game, enemySquare) && enemy.getValue() == PieceValue.PAWN_VALUE) {
+                return (Pawn) enemy;
+            }
+        }
+        return null;
+    }
+
+    private boolean isNotBlocked(Game game, Square frontSquare) {
+        return game.getPieceAt(frontSquare) == null;
+    }
+
+    private boolean isOnInitialSquare() {
+        return square.getRank() == getInitialRank();
+    }
+
+    public int getInitialRank() {
+        if (isWhite) {
+            return WHITE_PAWN_INITIAL_RANK;
+        }
+        return BLACK_PAWN_INITIAL_RANK;
     }
 
     @Override
@@ -129,6 +189,7 @@ public class Pawn extends Piece {
                 "isWhite=" + isWhite +
                 ", square=" + square +
                 ", symbol=" + symbol +
+                ", canBeCapturedByEnPassant=" + canBeCapturedByEnPassant +
                 '}';
     }
 }

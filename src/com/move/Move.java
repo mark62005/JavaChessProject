@@ -3,10 +3,9 @@ package com.move;
 import com.*;
 import com.piece.*;
 
-import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
-import static com.InputValidators.SQUARE_REGEX;
 import static com.piece.PieceValue.*;
 
 public class Move {
@@ -28,25 +27,25 @@ public class Move {
 
     public void makeAMove(Game game, Piece myPiece) {
         // update myPiece
-        updateMyPiece(myPiece);
+        updateMyPiece(game, myPiece);
         // update the board
         updateBoard(game, myPiece);
 
         if (myPiece.getValue() == KING_VALUE) {
             updateKingPos(game);
         }
+
+
     }
 
-    protected void updateMyPiece(Piece myPiece) {
+    protected void updateMyPiece(Game game, Piece myPiece) {
         // update the square of myPiece
         myPiece.setSquare(to);
         // check for special conditions for future moves (e.g. Castling, En Passant and Promotion)
-        checkSpecialConditions(myPiece);
-
-        myPiece.setPrevMove(this);
+        checkSpecialConditions(game, myPiece);
     }
 
-    protected void checkSpecialConditions(Piece piece) {
+    protected void checkSpecialConditions(Game game, Piece piece) {
         int value = piece.getValue();
 
         if (value == KING_VALUE) {
@@ -56,22 +55,25 @@ public class Move {
             Rook rook = (Rook) piece;
             rook.setCanCastling(false);
         } else if (value == PAWN_VALUE) {
-            Pawn pawn = (Pawn) piece;
-            // TODO: work on promotion condition
-            pawn.setFirstMove(false);
-            if (canEnPassant(pawn)) {
-                pawn.setCanEnPassant(true);
-            }
+            checkPawnConditions(piece);
         }
     }
 
-    // TODO: work on enemy condition
-    private boolean canEnPassant(Pawn pawn) {
-        if (pawn.isWhite()) {
-            return pawn.getSquare().getRank() == 5;
-        } else {
-            return pawn.getSquare().getRank() == 4;
+    private void checkPawnConditions(Piece piece) {
+        Pawn pawn = (Pawn) piece;
+        pawn.setFirstMove(false);
+        if (pawn.isOnFifthRank()) {
+            pawn.setCanEnPassant(true);
         }
+        if (hasPawnJumped(pawn)) {
+            pawn.setCanBeCapturedByEnPassant(true);
+        }
+    }
+
+    private boolean hasPawnJumped(Pawn pawn) {
+        int initialRank = pawn.getInitialRank();
+        int jumpedRank = pawn.getJumpedRank();
+        return from.getRank() == initialRank && to.getRank() == jumpedRank;
     }
 
     protected void updateBoard(Game game, Piece myPiece) {
@@ -95,7 +97,6 @@ public class Move {
             throw new IllegalArgumentException("Invalid input. Please follow the format of UCI input.");
         }
 
-        // TODO: work on promotion UCI
         String uci = userInput.substring(0, 4);
         Square from = Square.parse(uci.substring(0, 2));
         Square to = Square.parse(uci.substring(2, 4));
