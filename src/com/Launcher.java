@@ -3,7 +3,6 @@ package com;
 import com.move.Move;
 import com.move.PawnPromotion;
 import com.piece.Piece;
-import com.piece.Queen;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -15,10 +14,6 @@ public class Launcher {
         // initialize the game
         Scanner scanner = new Scanner(System.in);
         Game game = Game.getInstance();
-
-        // test
-        game.setPieceAt(new Square(1, 3), null);
-        game.setPieceAt(new Square(6, 3), null);
 
         // start the game
         printStartMessage();

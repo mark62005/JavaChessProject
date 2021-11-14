@@ -1,7 +1,7 @@
 package com;
 
 public enum Termination {
-    // TODO: work on termination message
+    // TODO: work on draw
     WHITE_WON ("Game over - 1-0 - White won"),
     BLACK_WON ("Game over - 1-0 - Black won"),
     WHITE_WON_CHECKMATE ("Game over - 1-0 - White won by checkmate"),
@@ -29,6 +29,13 @@ public enum Termination {
     }
 
     public static Termination winByResignation(Color color) {
+        if (color.equals(Color.WHITE)) {
+            return WHITE_WON_RESIGNATION;
+        }
+        return BLACK_WON_RESIGNATION;
+    }
+
+    public static Termination winByCapturingKing(Color color) {
         if (color.equals(Color.WHITE)) {
             return WHITE_WON_RESIGNATION;
         }

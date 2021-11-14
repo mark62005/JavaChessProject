@@ -11,9 +11,9 @@ import static com.piece.PieceValue.*;
 public class Game {
 
     private static Game instance;
-    private Piece[][] board;
-    private Player whitePlayer;
-    private Player blackPlayer;
+    private final Piece[][] board;
+    private final Player whitePlayer;
+    private final Player blackPlayer;
     private Color colorToMove;
     private Termination termination;
 
@@ -75,11 +75,6 @@ public class Game {
     public Termination getTermination() {
         return termination;
     }
-
-    public void setTermination(Termination termination) {
-        this.termination = termination;
-    }
-
     public void initializeBoard() {
         initializePieces(Color.WHITE);
         initializePieces(Color.BLACK);
@@ -309,15 +304,9 @@ public class Game {
     // TODO: use Termination
     public void checkWin() {
         if (isCheckMate()) {
-            if (colorToMove.equals(Color.WHITE)) {
-                setTermination(Termination.WHITE_WON_CHECKMATE);
-            } else {
-                setTermination(Termination.BLACK_WON_CHECKMATE);
-            }
-        } else if (whitePlayer.isKingCaptured()) {
-            setTermination(Termination.BLACK_WON);
-        } else if (blackPlayer.isKingCaptured()) {
-            setTermination(Termination.WHITE_WON);
+            termination = Termination.winByCheckmate(colorToMove);
+        } else if (whitePlayer.isKingCaptured() || blackPlayer.isKingCaptured()) {
+            termination = Termination.winByCapturingKing(colorToMove);
         } else {
             // TODO: work on draw
         }
@@ -354,11 +343,11 @@ public class Game {
     }
 
     public void resign(){
-        if (colorToMove.equals(Color.WHITE)) {
-            setTermination(Termination.BLACK_WON_RESIGNATION);
-        } else {
-            setTermination(Termination.WHITE_WON_RESIGNATION);
+        Color opponentColor = Color.BLACK;
+        if (colorToMove.equals(Color.BLACK)) {
+            opponentColor = Color.WHITE;
         }
+        termination = Termination.winByCheckmate(opponentColor);
     }
     
 }

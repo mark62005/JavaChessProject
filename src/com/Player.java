@@ -8,8 +8,8 @@ import java.util.List;
 
 public class Player {
 
-    private Color color;
-    private List<Piece> pieces;
+    private final Color color;
+    private final List<Piece> pieces;
     private boolean isKingCaptured;
     private Square kingPos;
 
