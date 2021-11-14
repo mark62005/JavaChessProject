@@ -17,12 +17,11 @@ public class Launcher {
         Game game = Game.getInstance();
 
 //        // test
-        game.setPieceAt(new Square(7, 3), null);
-        game.setPieceAt(new Square(6, 3), null);
-        Pawn pawn = new Pawn(true);
-        pawn.setSquare(new Square(6,3));
-        game.getWhitePlayer().getPieces().add(pawn);
-        game.setPieceAt(new Square(6, 3), pawn);
+        game.setPieceAt(new Square(0, 1), null);
+        game.setPieceAt(new Square(0, 2), null);
+        game.setPieceAt(new Square(0, 3), null);
+        game.setPieceAt(new Square(7, 5), null);
+        game.setPieceAt(new Square(7, 6), null);
 
         // start the game
         printStartMessage();
@@ -122,7 +121,7 @@ public class Launcher {
             if (!isPromotionPattern(userInput)) {
                 Move move = Move.parseUCI(userInput);
 
-                if (!isMyPiece(game, move)) {
+                if (isNotMyPiece(game, move)) {
                     System.out.println(
                             "Invalid input, please choose a " +
                                     game.getColorToMove().toString() + " piece."
@@ -136,7 +135,7 @@ public class Launcher {
                 // make a promotion move
                 Move move = PawnPromotion.parsePromotionUCI(game, userInput);
 
-                if (!isMyPiece(game, move)) {
+                if (isNotMyPiece(game, move)) {
                     System.out.println(
                             "Invalid input, please choose a " +
                                     game.getColorToMove().toString() + " piece."
@@ -155,7 +154,7 @@ public class Launcher {
         }
     }
 
-    public static boolean isMyPiece(Game game, Move move) {
+    public static boolean isNotMyPiece(Game game, Move move) {
         List<Piece> myPieces = game.getWhitePlayer().getPieces();
 
         if (game.getColorToMove().equals(Color.BLACK)) {
@@ -163,7 +162,7 @@ public class Launcher {
         }
 
         Piece piece = game.getPieceAt(move.getFrom());
-        return myPieces.contains(piece);
+        return !myPieces.contains(piece);
     }
 
     public static String getUserInput(Scanner scanner, Game game) {

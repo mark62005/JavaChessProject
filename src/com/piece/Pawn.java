@@ -11,8 +11,6 @@ import java.util.Objects;
 import java.util.Set;
 
 public class Pawn extends Piece {
-    private boolean promoted;
-    private Piece newPiece;
     private boolean isFirstMove;
     private boolean canEnPassant;
 
@@ -30,24 +28,6 @@ public class Pawn extends Piece {
         } else {
             this.symbol = PieceSymbol.BLACK_PAWN_SYMBOL;
         }
-    }
-
-    public boolean isPromoted() {
-        return promoted;
-    }
-
-    // TODO: work on promotion
-    public void promote(Piece newPiece) {
-        if (!promoted) {
-            this.promoted = true;
-            this.newPiece = newPiece;
-        } else {
-            System.out.println("It's already been promoted.");
-        }
-    }
-
-    public boolean isFirstMove() {
-        return isFirstMove;
     }
 
     public void setFirstMove(boolean firstMove) {
@@ -91,7 +71,6 @@ public class Pawn extends Piece {
                 new Square(currRank + offset, currFile + 1),
         };
 
-        // TODO: work on promotions
         // TODO: work on en passant
         for (int i = 0; i < possibleMoveCandidates.length; i++) {
 
@@ -102,12 +81,7 @@ public class Pawn extends Piece {
                                 this.isWhite && candidate.getRank() == 7 ||
                                 !this.isWhite && candidate.getRank() == 0
                         ) {
-                            if (!isEnemy(game, candidate)) {
-                                // Promotion
-                                addNormalMove(possibleMoves, this.square, candidate);
-                            } else {
-
-                            }
+                            addPromotionMove(possibleMoves, this.square, candidate, 'q');
                         } else {
                             if (!isEnemy(game, candidate)) {
                                 // normal move
@@ -141,12 +115,12 @@ public class Pawn extends Piece {
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
         Pawn pawn = (Pawn) o;
-        return promoted == pawn.promoted && newPiece.equals(pawn.newPiece);
+        return isFirstMove == pawn.isFirstMove && canEnPassant == pawn.canEnPassant;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(promoted, newPiece);
+        return Objects.hash(super.hashCode(), isFirstMove, canEnPassant);
     }
 
     @Override

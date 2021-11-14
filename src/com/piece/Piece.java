@@ -1,10 +1,8 @@
 package com.piece;
 
 import com.Game;
-import com.move.AttackMove;
-import com.move.Move;
+import com.move.*;
 import com.Square;
-import com.move.PawnPromotion;
 
 import java.util.Objects;
 import java.util.Set;
@@ -94,6 +92,11 @@ public abstract class Piece {
         newPiece.setSquare(this.square);
         newPiece.setPrevMove(this.prevMove);
         moves.add(new PawnPromotion(from, to, newPiece));
+    }
+
+    protected void addCastlingMove(Set<Move> moves, Square from, Square to, CastleSide side) {
+        Square newTo = new Square(to);
+        moves.add(new Castling(from, newTo, side));
     }
 
     protected final boolean isNotAlly (Game game, Square to) {
