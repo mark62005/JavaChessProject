@@ -64,11 +64,7 @@ public class PawnPromotion extends Move implements Attack {
     }
 
     private void updatePieces(Game game, Piece currPiece) {
-        List<Piece> pieces = game.getWhitePlayer().getPieces();
-        if (game.getColorToMove().equals(Color.BLACK)) {
-            pieces = game.getBlackPlayer().getPieces();
-        }
-
+        List<Piece> pieces = game.getCurrPlayer().getPieces();
         // remove that pawn from piece list
         pieces.remove(currPiece);
         // add the promoted piece to piece list

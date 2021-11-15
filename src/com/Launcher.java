@@ -141,21 +141,14 @@ public class Launcher {
     }
 
     private static boolean isNotMyPiece(Game game, Move move) {
-        List<Piece> myPieces = game.getWhitePlayer().getPieces();
-
-        if (game.getColorToMove().equals(Color.BLACK)) {
-            myPieces = game.getBlackPlayer().getPieces();
-        }
-
+        List<Piece> myPieces = game.getCurrPlayer().getPieces();
         Piece piece = game.getPieceAt(move.getFrom());
+
         return !myPieces.contains(piece);
     }
 
     private static boolean isNotMyPiece(Game game, Square square) {
-        List<Piece> pieces = game.getWhitePlayer().getPieces();
-        if (game.getColorToMove().equals(Color.BLACK)) {
-            pieces = game.getBlackPlayer().getPieces();
-        }
+        List<Piece> pieces = game.getCurrPlayer().getPieces();
         return pieces.stream().noneMatch(p -> p.getSquare().equals(square));
     }
 
@@ -241,10 +234,7 @@ public class Launcher {
     }
 
     private static void printAllPossibleMoves(Game game) {
-        Player currPlayer = game.getWhitePlayer();
-        if (game.getColorToMove().equals(Color.BLACK)) {
-            currPlayer = game.getBlackPlayer();
-        }
+        Player currPlayer = game.getCurrPlayer();
 
         Map<Square, Set<Move>> allPossibleMoves = game.getAllPossibleMoves(currPlayer);
         // TODO: sort the map keys

@@ -83,11 +83,7 @@ public class Move {
     }
 
     private void updateKingPos(Game game) {
-        Player player = game.getWhitePlayer();
-        if (game.getColorToMove().equals(Color.BLACK)) {
-            player = game.getBlackPlayer();
-        }
-
+        Player player = game.getCurrPlayer();
         player.setKingPos(to);
     }
 
