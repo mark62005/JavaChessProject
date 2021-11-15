@@ -78,8 +78,10 @@ public class Pawn extends Piece {
             if (candidate.isWithinBorder() && isNotAlly(game, candidate)) {
                     if (i == 0) {
 
-                        int lastRank = getLastRank();
-                        if (candidate.getRank() == lastRank) {
+                        if (
+                                candidate.getRank() == getLastRank(game) &&
+                                game.getPieceAt(candidate) == null
+                        ) {
                             // add promotion move
                             addPromotionMove(possibleMoves, square, candidate);
                         } else {
@@ -94,7 +96,7 @@ public class Pawn extends Piece {
                         // pawn jump
                         if (
                                 isFirstMove &&
-                                isOnInitialSquare() &&
+                                isOnInitialSquare(game) &&
                                 isNotBlocked(game, frontSquare) &&
                                 !isEnemy(game, candidate)
                         ) {
@@ -109,50 +111,34 @@ public class Pawn extends Piece {
         return possibleMoves;
     }
 
-    public int getLastRank() {
-        if (isWhite) {
-            return WHITE_PAWN_LAST_RANK;
-        }
-        return BLACK_PAWN_LAST_RANK;
-    }
-
-    public int getJumpedRank() {
-        if (isWhite) {
-            return WHITE_PAWN_JUMPED_RANK;
-        }
-        return BLACK_PAWN_JUMPED_RANK;
-    }
-
     private void checkAttackMoveConditions(Game game, Set<Move> possibleMoves, Square candidate) {
         Pawn enemy = getEnemyPawnBeside(game, candidate);
         // check if that candidate matches the conditions to perform En Passant
         if (
                 canEnPassant &&
-                isOnFifthRank() &&
+                isOnFifthRank(game) &&
                 enemy != null &&
                 enemy.canBeCapturedByEnPassant()
         ) {
             addEnPassantMove(possibleMoves, square, candidate, enemy);
         } else if (isEnemy(game, candidate)) {
             // else,
-            // check if it matches the condition to perform a normal attack move
-            addAttackMove(possibleMoves, square, candidate, game);
+            if (candidate.getRank() == getLastRank(game)) {
+                // promotion & attack move
+                addPromotionMove(possibleMoves, square, candidate, game);
+            } else {
+                // normal attack move
+                addAttackMove(possibleMoves, square, candidate, game);
+            }
         }
     }
 
-    private int getFifthRank() {
-        if (isWhite) {
-            return WHITE_PAWN_FIFTH_RANK;
-        }
-        return BLACK_PAWN_FIFTH_RANK;
-    }
-
-    public boolean isOnFifthRank() {
-        return square.getRank() == getFifthRank();
+    public boolean isOnFifthRank(Game game) {
+        return square.getRank() == getFifthRank(game);
     }
 
     public Pawn getEnemyPawnBeside(Game game, Square candidate) {
-        Square enemySquare = new Square(getFifthRank(), candidate.getFile());
+        Square enemySquare = new Square(getFifthRank(game), candidate.getFile());
         if (enemySquare.isWithinBorder()) {
             Piece enemy = game.getPieceAt(enemySquare);
             if (isEnemy(game, enemySquare) && enemy.getValue() == PieceValue.PAWN_VALUE) {
@@ -166,15 +152,8 @@ public class Pawn extends Piece {
         return game.getPieceAt(frontSquare) == null;
     }
 
-    private boolean isOnInitialSquare() {
-        return square.getRank() == getInitialRank();
-    }
-
-    public int getInitialRank() {
-        if (isWhite) {
-            return WHITE_PAWN_INITIAL_RANK;
-        }
-        return BLACK_PAWN_INITIAL_RANK;
+    private boolean isOnInitialSquare(Game game) {
+        return square.getRank() == getInitialRank(game);
     }
 
     @Override

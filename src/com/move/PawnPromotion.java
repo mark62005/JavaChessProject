@@ -9,8 +9,14 @@ import java.util.List;
 
 public class PawnPromotion extends Move implements Attack {
     private Piece promoteTo;
+    private Piece enemy;
 
     public PawnPromotion(Square from, Square to, Piece promoteTo) {
+        super(from, to);
+        setPromoteTo(promoteTo);
+    }
+
+    public PawnPromotion(Square from, Square to, Piece promoteTo, Piece enemy) {
         super(from, to);
         setPromoteTo(promoteTo);
     }

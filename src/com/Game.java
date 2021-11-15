@@ -305,7 +305,11 @@ public class Game {
     }
 
     public void checkWin(Player currPlayer, Player opponent) {
-        if (isStaleMate(currPlayer, opponent)) {
+        if (
+                currPlayer.getPieces().size() < 8 &&
+                opponent.getPieces().size() < 8 &&
+                isStaleMate(currPlayer, opponent)
+        ) {
             termination = Termination.DRAW_STALEMATE;
         } else if (isCheckMate(currPlayer, opponent)) {
             termination = Termination.winByCheckmate(colorToMove);

@@ -26,25 +26,23 @@ public class Move {
 
     public void makeAMove(Game game, Piece myPiece) {
         // update myPiece
-        updateMyPiece(myPiece);
+        updateMyPiece(game, myPiece);
         // update the board
         updateBoard(game, myPiece);
 
         if (myPiece.getValue() == KING_VALUE) {
             updateKingPos(game);
         }
-
-
     }
 
-    protected void updateMyPiece(Piece myPiece) {
+    protected void updateMyPiece(Game game, Piece myPiece) {
         // update the square of myPiece
         myPiece.setSquare(to);
         // check for special conditions for future moves (e.g. Castling, En Passant and Promotion)
-        checkSpecialConditions(myPiece);
+        checkSpecialConditions(game, myPiece);
     }
 
-    protected void checkSpecialConditions(Piece piece) {
+    protected void checkSpecialConditions(Game game, Piece piece) {
         int value = piece.getValue();
 
         if (value == KING_VALUE) {
@@ -54,24 +52,24 @@ public class Move {
             Rook rook = (Rook) piece;
             rook.setCanCastling(false);
         } else if (value == PAWN_VALUE) {
-            checkPawnConditions(piece);
+            checkPawnConditions(game, piece);
         }
     }
 
-    private void checkPawnConditions(Piece piece) {
+    private void checkPawnConditions(Game game, Piece piece) {
         Pawn pawn = (Pawn) piece;
         pawn.setFirstMove(false);
-        if (pawn.isOnFifthRank()) {
+        if (pawn.isOnFifthRank(game)) {
             pawn.setCanEnPassant(true);
         }
-        if (hasPawnJumped(pawn)) {
+        if (hasPawnJumped(game)) {
             pawn.setCanBeCapturedByEnPassant(true);
         }
     }
 
-    private boolean hasPawnJumped(Pawn pawn) {
-        int initialRank = pawn.getInitialRank();
-        int jumpedRank = pawn.getJumpedRank();
+    private boolean hasPawnJumped(Game game) {
+        int initialRank = PawnRank.getInitialRank(game);
+        int jumpedRank = PawnRank.getJumpedRank(game);
         return from.getRank() == initialRank && to.getRank() == jumpedRank;
     }
 
