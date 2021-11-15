@@ -55,15 +55,23 @@ public class Square {
 
     private static int parseUnit(char ch) {
         switch (ch) {
-            case 'a', '1' -> { return 0; }
-            case 'b', '2' -> { return 1; }
-            case 'c', '3' -> { return 2; }
-            case 'd', '4' -> { return 3; }
-            case 'e', '5' -> { return 4; }
-            case 'f', '6' -> { return 5; }
-            case 'g', '7' -> { return 6; }
-            case 'h', '8' -> { return 7; }
-            default -> throw new IndexOutOfBoundsException();
+            case 'a' : { return 0; }
+            case '1' : { return 0; }
+            case 'b': { return 1; }
+            case '2' : { return 1; }
+            case 'c' : { return 2; }
+            case '3' : { return 2; }
+            case 'd' : { return 3; }
+            case '4' : { return 3; }
+            case 'e' : { return 4; }
+            case '5' : { return 4; }
+            case 'f' : { return 5; }
+            case '6' : { return 5; }
+            case '7' : { return 6; }
+            case 'g' : { return 6; }
+            case 'h': { return 7; }
+            case '8' : { return 7; }
+            default : throw new IndexOutOfBoundsException();
         }
     }
 
@@ -88,15 +96,23 @@ public class Square {
     public String toString() {
         String fileStr = "";
         switch (file) {
-            case 0 -> fileStr = "a";
-            case 1 -> fileStr = "b";
-            case 2 -> fileStr = "c";
-            case 3 -> fileStr = "d";
-            case 4 -> fileStr = "e";
-            case 5 -> fileStr = "f";
-            case 6 -> fileStr = "g";
-            case 7 -> fileStr = "h";
-            default -> {}
+            case 0 : fileStr = "a";
+                break;
+            case 1 : fileStr = "b";
+                break;
+            case 2 : fileStr = "c";
+                break;
+            case 3 : fileStr = "d";
+                break;
+            case 4 : fileStr = "e";
+                break;
+            case 5 : fileStr = "f";
+                break;
+            case 6 : fileStr = "g";
+                break;
+            case 7 : fileStr = "h";
+                break;
+            default : {}
         }
 
         return fileStr + (rank + 1);

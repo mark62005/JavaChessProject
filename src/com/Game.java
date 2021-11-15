@@ -163,6 +163,18 @@ public class Game {
         Square to = move.getTo();
         Piece myPiece = getPieceAt(from);
 
+        if(myPiece.getValue() == 1){
+            if (myPiece.isWhite() && ((Pawn)myPiece).getSquare().toString().charAt(1) == '7'){
+                if (!condition.equals("promotion")) {
+                    throw new IllegalArgumentException("Invalid input. Must declare promotion code");
+                }
+            } else if (!myPiece.isWhite() && ((Pawn)myPiece).getSquare().toString().charAt(1) == '2'){
+                if (!condition.equals("promotion")) {
+                    throw new IllegalArgumentException("Invalid input. Must declare promotion code.");
+                }
+            }
+        }
+
         Set<Move> possibleMoves = myPiece.findPossibleMoves(this);
         // check if it's a valid move
         if (isValidMove(possibleMoves, to)) {
