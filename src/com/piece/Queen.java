@@ -23,16 +23,11 @@ public class Queen extends Piece {
     }
 
     @Override
-    public void move() {
-        System.out.println("Like bishop and rook");
-    }
-
-    @Override
     public Set<Move> findPossibleMoves(Game game) {
         Set<Move> possibleMoves = new HashSet<>();
 
-        int currRank = this.square.getRank();
-        int currFile = this.square.getFile();
+        int currRank = square.getRank();
+        int currFile = square.getFile();
         // https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Chessboard480.svg/416px-Chessboard480.svg.png
         Square[] possibleMoveCandidates = {
                 // up
@@ -63,11 +58,11 @@ public class Queen extends Piece {
                         // if that candidate is an enemy, add an attack move,
                         // then move to next possibleMoveCandidate
                         if (isEnemy(game, candidate)) {
-                            addAttackMove(possibleMoves, this.square, candidate, game);
+                            addAttackMove(possibleMoves, square, candidate, game);
                             break currCandidate;
                         } else {
                             // if that candidate is not an enemy, add a normal move,
-                            addNormalMove(possibleMoves, this.square, candidate);
+                            addNormalMove(possibleMoves, square, candidate);
                             // then search 1 further square with the same direction
                             int candidateRank = candidate.getRank();
                             int candidateFile = candidate.getFile();

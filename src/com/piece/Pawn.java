@@ -49,11 +49,6 @@ public class Pawn extends Piece {
     }
 
     @Override
-    public void move() {
-        System.out.println("Forward 1");
-    }
-
-    @Override
     public Set<Move> findPossibleMoves(Game game) {
         Set<Move> possibleMoves = new HashSet<>();
 

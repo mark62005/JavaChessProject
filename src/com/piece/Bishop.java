@@ -23,11 +23,6 @@ public class Bishop extends Piece {
     }
 
     @Override
-    public void move() {
-        System.out.println("Diagonally");
-    }
-
-    @Override
     public Set<Move> findPossibleMoves(Game game) {
         Set<Move> possibleMoves = new HashSet<>();
 

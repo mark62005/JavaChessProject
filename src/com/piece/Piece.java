@@ -46,8 +46,6 @@ public abstract class Piece {
         this.square = square;
     }
 
-    public abstract void move();
-
     public abstract Set<Move> findPossibleMoves(Game game);
 
     protected void addNormalMove(Set<Move> moves, Square from, Square to) {

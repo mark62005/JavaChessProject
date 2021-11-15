@@ -36,11 +36,6 @@ public class King extends Piece {
     }
 
     @Override
-    public void move() {
-        System.out.println("One square");
-    }
-
-    @Override
     public Set<Move> findPossibleMoves(Game game) {
         Set<Move> possibleMoves = new HashSet<>();
 
