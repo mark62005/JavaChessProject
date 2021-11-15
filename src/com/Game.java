@@ -318,12 +318,12 @@ public class Game {
         List<Piece> myPieces = getCurrPlayer().getPieces();
 
         for (Piece piece : myPieces) {
-            if (isRook(piece)) {
+            if (piece.getValue() == ROOK_VALUE) {
                 Rook rook = (Rook) piece;
                 if (!rook.canCastling()) {
                     return false;
                 }
-            } else if (isKing(piece)) {
+            } else if (piece.getValue() == KING_VALUE) {
                 King king = (King) piece;
                 if (!king.canCastling()) {
                     return false;
@@ -331,14 +331,6 @@ public class Game {
             }
         }
         return true;
-    }
-
-    private boolean isRook(Piece piece) {
-        return piece.getValue() == ROOK_VALUE;
-    }
-
-    private boolean isKing(Piece piece) {
-        return piece.getValue() == KING_VALUE;
     }
 
     public void resign(){
