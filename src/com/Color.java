@@ -13,6 +13,6 @@ public enum Color {
         public String toString() {
             return "black";
         }
-    };
+    }
 
 }

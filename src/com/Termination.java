@@ -1,14 +1,14 @@
 package com;
 
 public enum Termination {
-    // TODO: work on draw
-    WHITE_WON ("Game over - 1-0 - White won"),
-    BLACK_WON ("Game over - 1-0 - Black won"),
+    WHITE_WON_BY_CAPTURING_KING ("Game over - 1-0 - White won"),
+    BLACK_WON_BY_CAPTURING_KING ("Game over - 1-0 - Black won"),
     WHITE_WON_CHECKMATE ("Game over - 1-0 - White won by checkmate"),
     BLACK_WON_CHECKMATE ("Game over - 1-0 - Black won by checkmate"),
     WHITE_WON_RESIGNATION ("Game over - 1-0 - White won by resignation"),
     BLACK_WON_RESIGNATION ("Game over - 1-0 - Black won by resignation"),
     DRAW_STALEMATE ("Game over - Draw by stalemate"),
+    // TODO: work on draw by fifty move
     DRAW_FIFTY_MOVE ("Game over - Draw by fifty-move");
 
     private final String score;
@@ -37,8 +37,8 @@ public enum Termination {
 
     public static Termination winByCapturingKing(Color color) {
         if (color.equals(Color.WHITE)) {
-            return WHITE_WON_RESIGNATION;
+            return WHITE_WON_BY_CAPTURING_KING;
         }
-        return BLACK_WON_RESIGNATION;
+        return BLACK_WON_BY_CAPTURING_KING;
     }
 }

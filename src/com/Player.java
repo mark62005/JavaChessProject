@@ -8,13 +8,19 @@ import java.util.List;
 
 public class Player {
 
+    private final Color color;
     private final List<Piece> pieces;
     private boolean isKingCaptured;
     private Square kingPos;
 
-    public Player() {
+    public Player(Color color) {
+        this.color = color;
         this.pieces = new ArrayList<>();
         this.isKingCaptured = false;
+    }
+
+    public Color getColor() {
+        return color;
     }
 
     public List<Piece> getPieces() {

@@ -18,8 +18,8 @@ public class Game {
     private Termination termination;
 
     private Game() {
-        this.whitePlayer = new Player();
-        this.blackPlayer = new Player();
+        this.whitePlayer = new Player(Color.WHITE);
+        this.blackPlayer = new Player(Color.BLACK);
 
         // initialize the board
         this.board = new Piece[8][8];
@@ -54,14 +54,6 @@ public class Game {
         int rank = square.getRank();
         int file = square.getFile();
         board[rank][file] = piece;
-    }
-
-    public Player getWhitePlayer() {
-        return whitePlayer;
-    }
-
-    public Player getBlackPlayer() {
-        return blackPlayer;
     }
 
     public Color getColorToMove() {
@@ -191,22 +183,39 @@ public class Game {
             // perform a move
             move.makeAMove(this, myPiece);
 
-            List<Piece> opponentPieces = blackPlayer.getPieces();
-            if (colorToMove.equals(Color.BLACK)) {
-                opponentPieces = whitePlayer.getPieces();
-            }
-            for (Piece piece : opponentPieces) {
-                if (piece.getValue() == PAWN_VALUE) {
-                    Pawn pawn = (Pawn) piece;
-                    pawn.setCanBeCapturedByEnPassant(false);
-                }
-            }
+            Player currPlayer = getCurrPlayer();
+            Player opponent = getOpponent();
 
+            resetOpponentCanEnPassantState(opponent);
             // check if anyone wins after each move
-            checkWin();
+            checkWin(currPlayer, opponent);
             // switch the player after each move
             switchPlayer();
         }
+    }
+
+    // En Passant is allowed to be performed in the next round
+    private void resetOpponentCanEnPassantState(Player opponent) {
+        for (Piece piece : opponent.getPieces()) {
+            if (piece.getValue() == PAWN_VALUE) {
+                Pawn pawn = (Pawn) piece;
+                pawn.setCanBeCapturedByEnPassant(false);
+            }
+        }
+    }
+
+    public Player getCurrPlayer() {
+        if (colorToMove.equals(Color.WHITE)) {
+            return whitePlayer;
+        }
+        return blackPlayer;
+    }
+
+    public Player getOpponent() {
+        if (colorToMove.equals(Color.WHITE)) {
+            return blackPlayer;
+        }
+        return whitePlayer;
     }
 
     private boolean isValidMove(Set<Move> possibleMoves, Square to) {
@@ -230,24 +239,23 @@ public class Game {
     }
 
     // check if all of opponent's possible moves contains opponent's King Position
-    public boolean isNotInCheck(boolean isWhite, Square currSquare) {
-        Player opponent;
-        if (isWhite) {
-            opponent = blackPlayer;
-        } else {
-            opponent = whitePlayer;
-        }
-
+    public boolean isNotInCheck(Square currSquare) {
+        Player opponent = getOpponent();
         Map<Square, Set<Move>> opponentPossibleMoves = getAllPossibleMoves(opponent);
         // check if it contains King's position
         return !getFlattenPossibleMovesMap(opponentPossibleMoves).contains(currSquare);
     }
 
-    public boolean isCheckMate() {
-        Player opponent = blackPlayer;
-        if (colorToMove.equals(Color.BLACK)) {
-            opponent = whitePlayer;
+    public boolean isCheckMate(Player currPlayer, Player opponent) {
+        if (isStaleMate(currPlayer, opponent)) {
+            Map<Square, Set<Move>> myPossibleMoves = getAllPossibleMoves(currPlayer);
+            return getFlattenPossibleMovesMap(myPossibleMoves).contains(opponent.getKingPos());
         }
+        return false;
+    }
+
+    // King is not in check but all of its possible move destinations are in check.
+    public boolean isStaleMate(Player currPlayer, Player opponent) {
         Square opponentKingPos = opponent.getKingPos();
 
         // find possible move destinations for opponent's King
@@ -256,12 +264,7 @@ public class Game {
                 opponentPossibleKingMoves.stream()
                         .map(Move::getTo)
                         .collect(Collectors.toSet());
-        opponentPossibleKingTos.add(opponentKingPos);
 
-        Player currPlayer = whitePlayer;
-        if (colorToMove.equals(Color.BLACK)) {
-            currPlayer = blackPlayer;
-        }
         // find all my possible move destinations
         Map<Square, Set<Move>> myPossibleMoves = getAllPossibleMoves(currPlayer);
 
@@ -301,29 +304,30 @@ public class Game {
                 .anyMatch(getFlattenPossibleMovesMap(opponentPossibleMoves)::contains);
     }
 
-    public void checkWin() {
-        if (isCheckMate()) {
+    public void checkWin(Player currPlayer, Player opponent) {
+        if (
+                currPlayer.getPieces().size() < 8 &&
+                opponent.getPieces().size() < 8 &&
+                isStaleMate(currPlayer, opponent)
+        ) {
+            termination = Termination.DRAW_STALEMATE;
+        } else if (isCheckMate(currPlayer, opponent)) {
             termination = Termination.winByCheckmate(colorToMove);
         } else if (whitePlayer.isKingCaptured() || blackPlayer.isKingCaptured()) {
             termination = Termination.winByCapturingKing(colorToMove);
-        } else {
-            // TODO: work on draw
         }
     }
 
     public boolean isRookAndKingAtInitialPosition() {
-        List<Piece> myPieces = whitePlayer.getPieces();
-        if (colorToMove.equals(Color.BLACK)) {
-            myPieces = blackPlayer.getPieces();
-        }
+        List<Piece> myPieces = getCurrPlayer().getPieces();
 
         for (Piece piece : myPieces) {
-            if (isRook(piece)) {
+            if (piece.getValue() == ROOK_VALUE) {
                 Rook rook = (Rook) piece;
                 if (!rook.canCastling()) {
                     return false;
                 }
-            } else if (isKing(piece)) {
+            } else if (piece.getValue() == KING_VALUE) {
                 King king = (King) piece;
                 if (!king.canCastling()) {
                     return false;
@@ -333,20 +337,9 @@ public class Game {
         return true;
     }
 
-    private boolean isRook(Piece piece) {
-        return piece.getValue() == ROOK_VALUE;
-    }
-
-    private boolean isKing(Piece piece) {
-        return piece.getValue() == KING_VALUE;
-    }
-
     public void resign(){
-        Color opponentColor = Color.BLACK;
-        if (colorToMove.equals(Color.BLACK)) {
-            opponentColor = Color.WHITE;
-        }
-        termination = Termination.winByCheckmate(opponentColor);
+        Player opponent = getOpponent();
+        termination = Termination.winByCheckmate(opponent.getColor());
     }
     
 }

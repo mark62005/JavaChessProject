@@ -13,16 +13,9 @@ public interface Attack {
         return game.getPieceAt(to);
     }
 
-    default Player getOpponent(Game game) {
-        if (game.getColorToMove().equals(Color.WHITE)) {
-            return game.getBlackPlayer();
-        }
-        return game.getWhitePlayer();
-    }
-
     default void captureEnemy(Game game, Square to) {
         Piece enemy = getEnemy(game, to);
-        Player opponent = getOpponent(game);
+        Player opponent = game.getOpponent();
         for (Piece piece : opponent.getPieces()) {
             if (enemy.equals(piece)) {
                 opponent.getPieces().remove(enemy);

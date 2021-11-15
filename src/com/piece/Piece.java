@@ -46,8 +46,6 @@ public abstract class Piece {
         this.square = square;
     }
 
-    public abstract void move();
-
     public abstract Set<Move> findPossibleMoves(Game game);
 
     protected void addNormalMove(Set<Move> moves, Square from, Square to) {
@@ -56,8 +54,8 @@ public abstract class Piece {
     }
 
     protected void addAttackMove(Set<Move> moves, Square from, Square to, Game game) {
-        Piece enemy = game.getPieceAt(to);
         Square newTo = new Square(to);
+        Piece enemy = game.getPieceAt(newTo);
         moves.add(new AttackMove(from, newTo, enemy));
     }
 
@@ -65,6 +63,14 @@ public abstract class Piece {
         Queen queen = new Queen(isWhite);
         queen.setSquare(square);
         moves.add(new PawnPromotion(from, to, queen));
+    }
+
+    protected void addPromotionMove(Set<Move> moves, Square from, Square to, Game game) {
+        Queen queen = new Queen(isWhite);
+        queen.setSquare(square);
+
+        Piece enemy = game.getPieceAt(to);
+        moves.add(new PawnPromotion(from, to, queen, enemy));
     }
 
     protected void addCastlingMove(Set<Move> moves, Square from, Square to, CastleSide side) {

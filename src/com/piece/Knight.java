@@ -23,11 +23,6 @@ public class Knight extends Piece {
     }
 
     @Override
-    public void move() {
-        System.out.println("Like an L");
-    }
-
-    @Override
     public Set<Move> findPossibleMoves(Game game) {
         Set<Move> possibleMoves = new HashSet<>();
 

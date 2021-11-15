@@ -36,16 +36,11 @@ public class King extends Piece {
     }
 
     @Override
-    public void move() {
-        System.out.println("One square");
-    }
-
-    @Override
     public Set<Move> findPossibleMoves(Game game) {
         Set<Move> possibleMoves = new HashSet<>();
 
-        int currRank = this.square.getRank();
-        int currFile = this.square.getFile();
+        int currRank = square.getRank();
+        int currFile = square.getFile();
         // https://en.wikipedia.org/wiki/King_(chess)
         Square[] possibleMoveCandidates = {
                 // up
@@ -70,10 +65,10 @@ public class King extends Piece {
             if (candidate.isWithinBorder() && isNotAlly(game, candidate)) {
                 // if the candidate square is an enemy, add an attack move
                 if (isEnemy(game, candidate)) {
-                    addAttackMove(possibleMoves, this.square, candidate, game);
+                    addAttackMove(possibleMoves, square, candidate, game);
                 } else {
                     // else, add a normal move
-                    addNormalMove(possibleMoves, this.square, candidate);
+                    addNormalMove(possibleMoves, square, candidate);
                 }
             }
         }
@@ -83,7 +78,7 @@ public class King extends Piece {
 
     private void addCastlingMoves(Game game, Set<Move> possibleMoves) {
         int rank = 0;
-        if (!this.isWhite) {
+        if (!isWhite) {
             rank = 7;
         }
         addCastlingMove(game, possibleMoves, CastleSide.KING_SIDE, rank);
@@ -101,12 +96,12 @@ public class King extends Piece {
                 isNotCastlingThroughCheck(game, finalRookSquare) &&
                 isNotCastlingToCheck(game, finalKingSquare)
         ) {
-            addCastlingMove(possibleMoves, this.square, finalKingSquare, side);
+            addCastlingMove(possibleMoves, square, finalKingSquare, side);
         }
     }
 
     private boolean isNotInCheck(Game game) {
-        return game.isNotInCheck(this.isWhite, this.square);
+        return game.isNotInCheck(square);
     }
 
     // check if the squares between King and Rook are empty
@@ -128,11 +123,11 @@ public class King extends Piece {
     }
 
     private boolean isNotCastlingThroughCheck(Game game, Square finalRookSquare) {
-        return game.isNotInCheck(this.isWhite, finalRookSquare);
+        return game.isNotInCheck(finalRookSquare);
     }
 
     private boolean isNotCastlingToCheck(Game game, Square finalKingSquare) {
-        return game.isNotInCheck(this.isWhite, finalKingSquare);
+        return game.isNotInCheck(finalKingSquare);
     }
 
     @Override
